@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: <<PLACE HERE YOUR ACI CONNECTOR NAME>>
+  name: <<PLACE HERE YOUR ACI CONNECTOR NAME>>
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: <<PLACE HERE YOUR ACI CONNECTOR NAME>>
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: <<PLACE HERE YOUR ACI CONNECTOR NAME>>
+    spec:
+      containers:
+      - args:
+        - --provider
+        - azure
+        - --namespace
+        - default
+        - --nodename
+        - <<PLACE HERE YOUR ACI CONNECTOR NAME>>
+        - --os
+        - Linux
+        - --taint
+        - azure.com/aci
+        command:
+        - virtual-kubelet
+        env:
+        - name: KUBELET_PORT
+          value: "10250"
+        - name: AZURE_AUTH_LOCATION
+          value: /etc/virtual-kubelet/credentials.json
+        - name: ACI_RESOURCE_GROUP
+          value: <<PLACE HERE YOUR AZURE RESOURCE GROUP NAME FOR YOUR ACI DEPLOYMENTS>>
+        - name: ACI_REGION
+          value: <<PLACE HERE YOUR FAVORITE AZURE ACI REGION>>
+        - name: APISERVER_CERT_LOCATION
+          value: /etc/virtual-kubelet/cert.pem
+        - name: APISERVER_KEY_LOCATION
+          value: /etc/virtual-kubelet/key.pem
+        - name: VKUBELET_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        image: microsoft/virtual-kubelet:latest
+        imagePullPolicy: Always
+        name: <<PLACE HERE YOUR ACI CONNECTOR NAME>>
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/virtual-kubelet
+          name: credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: credentials
+        secret:
+          defaultMode: 420
+          secretName: <<PLACE HERE YOUR ACI CONNECTOR SECRETS NAME>>
