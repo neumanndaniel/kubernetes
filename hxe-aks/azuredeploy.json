@@ -79,7 +79,7 @@
       "name": "[concat(uniqueString(resourceGroup().id),'storage')]"
     },
     "operatingSystem": {
-      "imageOfferLinux": "Ubuntu",
+      "imageOfferLinux": "UbuntuServer",
       "imagePublisherLinux": "Canonical"
     },
     "virtualMachine": {
