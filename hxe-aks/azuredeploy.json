@@ -189,7 +189,7 @@
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmName'),variables('virtualMachine').publicIPAddressName))]"
               },
               "subnet": {
-                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName')),'/subnets/',parameters('subnetBackEndName'))]"
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName')),'/subnets/',parameters('subnetFrontEndName'))]"
               }
             }
           }
