@@ -41,7 +41,7 @@
     "linuxOsVersion": {
       "type": "string",
       "allowedValues": [
-        "16.04",
+        "16.04-LTS",
         "17.04"
       ],
       "metadata": {
