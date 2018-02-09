@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "value": "aksmanagementnetwork"
+    },
+    "virtualNetworkAddressPrefix": {
+      "value": "192.168.0.0/24"
+    },
+    "subnetFrontEndName": {
+      "value": "default"
+    },
+    "subnetFrontEndPrefix": {
+      "value": "192.168.0.0/24"
+    },
+    "linuxOsVersion": {
+      "value": "16.04"
+    },
+    "vmSize": {
+      "value": "Standard_A2_v2"
+    },
+    "vmName": {
+      "value": "aksmgmtvm"
+    }
+  }
+}
