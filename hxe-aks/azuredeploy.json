@@ -1,0 +1,281 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network name"
+      }
+    },
+    "virtualNetworkAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Address prefix of the Virtual Network"
+      }
+    },
+    "subnetFrontEndName": {
+      "type": "string",
+      "metadata": {
+        "description": "Front end subnet name of the Virtual Network"
+      }
+    },
+    "subnetFrontEndPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet prefix of the front end subnet of the Virtual Network"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password of the Virtual Machine."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username of the Virtual Machine."
+      }
+    },
+    "linuxOsVersion": {
+      "type": "string",
+      "allowedValues": [
+        "16.04",
+        "17.04"
+      ],
+      "metadata": {
+        "description": "Allowed Ubuntu versions of the VM. This will pick a fully patched image of this given Ubuntu version."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_A2_v2",
+      "allowedValues": [
+        "Standard_A2_v2"
+      ],
+      "metadata": {
+        "description": "Allowed VM size of the AKS management VM."
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the AKS management VM"
+      }
+    }
+  },
+  "variables": {
+    "automation": {
+      "gitHub": "https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/hxe-aks"
+    },
+    "apiVersion": {
+      "compute": "2017-03-30",
+      "network": "2017-10-01",
+      "storage": "2017-06-01"
+    },
+    "storage": {
+      "type": "Standard_LRS",
+      "name": "[concat(uniqueString(resourceGroup().id),'storage')]"
+    },
+    "operatingSystem": {
+      "imageOfferLinux": "Ubuntu",
+      "imagePublisherLinux": "Canonical"
+    },
+    "virtualMachine": {
+      "nicName": "-nic1",
+      "publicIPAddressName": "-publicip1",
+      "osDiskName": "-osdisk"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('apiVersion').storage]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[toLower(variables('storage').name)]",
+      "location": "[resourceGroup().location]",
+      "kind": "Storage",
+      "sku": {
+        "name": "[variables('storage').type]"
+      },
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": true
+            }
+          }
+        },
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion').network]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[concat(parameters('virtualNetworkName'),'-', parameters('subnetFrontEndName'),'-nsg')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "enabledPort-SSH-22",
+            "properties": {
+              "description": "Enabled port SSH 22 from Internet.",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "[parameters('subnetFrontEndPrefix')]",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion').network]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', concat(parameters('virtualNetworkName'),'-', parameters('subnetFrontEndName'),'-nsg'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('virtualNetworkAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetFrontEndName')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetFrontEndPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('virtualNetworkName'),'-', parameters('subnetFrontEndName'),'-nsg'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion').network]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat(parameters('vmName'),variables('virtualMachine').publicIPAddressName)]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion').network]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('vmName'),variables('virtualMachine').nicName)]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/',parameters('vmName'),variables('virtualMachine').publicIPAddressName)]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmName'),variables('virtualMachine').publicIPAddressName))]"
+              },
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName')),'/subnets/',parameters('subnetBackEndName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion').compute]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('vmName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat(parameters('vmName'),variables('virtualMachine').nicName)]",
+        "[concat('Microsoft.Storage/storageAccounts/',variables('storage').name)]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('operatingSystem').imagePublisherLinux]",
+            "offer": "[variables('operatingSystem').imageOfferLinux]",
+            "sku": "[parameters('linuxOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('vmName'),variables('virtualMachine').osDiskName)]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),variables('virtualMachine').nicName))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[reference(concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Storage/storageAccounts/',variables('storage').name),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "[variables('apiVersion').compute]",
+          "type": "extensions",
+          "name": "vmScriptExtension",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "[concat(variables('automation').gitHub,'/deploy_HXE_AKS_prereqs.sh')]"
+              ]
+            },
+            "protectedSettings": {
+              "commandToExecute": "sudo sh deploy_HXE_AKS_prereqs.sh"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "ipaddress": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmName'),variables('virtualMachine').publicIPAddressName)), variables('apiVersion').network).ipAddress]",
+      "type": "string"
+    },
+    "vmConfig": {
+      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',parameters('vmName'),'vmScriptExtension')).instanceView.statuses[0].message]",
+      "type": "string"
+    }
+  }
+}
