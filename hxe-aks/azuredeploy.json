@@ -8,6 +8,12 @@
         "description": "Password that will be used for the HXE installation."
       }
     },
+    "extensionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the AKS agent node extension"
+      }
+    },
     "vmName": {
       "type": "string",
       "metadata": {
@@ -33,7 +39,7 @@
         {
           "apiVersion": "[variables('apiVersion').compute]",
           "type": "extensions",
-          "name": "vmScriptExtension",
+          "name": "[parameters('extensionName')]",
           "location": "[resourceGroup().location]",
           "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName'))]"
