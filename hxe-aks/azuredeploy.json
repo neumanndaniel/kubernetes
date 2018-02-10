@@ -64,7 +64,7 @@
   ],
   "outputs": {
     "vmConfig": {
-      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',parameters('vmName'),'vmScriptExtension')).instanceView.statuses[0].message]",
+      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',parameters('vmName'),parameters('extensionName'))).instanceView.statuses[0].message]",
       "type": "string"
     }
   }
