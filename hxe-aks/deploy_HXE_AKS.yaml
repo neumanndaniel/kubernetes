@@ -47,7 +47,7 @@ spec:
     - name: hxe-config
       secret:
         defaultMode: 420
-        secretName: masterPassword
+        secretName: masterpassword
   imagePullSecrets:
   - name: docker-secret
   containers:
