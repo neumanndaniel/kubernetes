@@ -1,1 +1,1 @@
-# SAP HANA Express Edition - Deploy HANA Express database on Azure AKS - Managed Kubernetes
+# SAP HANA Express Edition - Deploy HANA Express database on AKS - Managed Kubernetes on Azure
