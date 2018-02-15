@@ -12,6 +12,7 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /data/hxe_pv
+'---'
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -23,6 +24,7 @@ spec:
   resources:
     requests:
       storage: 50Gi
+'---'
 apiVersion: v1
 kind: Pod
 metadata:
