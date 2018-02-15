@@ -1,5 +1,5 @@
-kind: PersistentVolume
 apiVersion: v1
+kind: PersistentVolume
 metadata:
   name: persistent-vol-hxe
   labels:
@@ -12,7 +12,6 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /data/hxe_pv
-`---`
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -24,7 +23,6 @@ spec:
   resources:
     requests:
       storage: 50Gi
-`---`
 apiVersion: v1
 kind: Pod
 metadata:
