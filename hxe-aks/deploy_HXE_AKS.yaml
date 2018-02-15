@@ -1,0 +1,74 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: persistent-vol-hxe
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 150Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/hxe_pv"
+`---`
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: hxe-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+`---`
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hxe-pod
+  labels:
+    name: hxe-pod
+spec:
+  initContainers:
+    - name: install
+      image: busybox
+      command: [ 'sh', '-c', 'chown 12000:79 /hana/mounts' ]
+      volumeMounts:
+        - name: hxe-data
+          mountPath: /hana/mounts
+  restartPolicy: OnFailure
+  volumes:
+    - name: hxe-data
+      persistentVolumeClaim:
+         claimName: hxe-pvc
+    - name: hxe-config
+      secret:
+        defaultMode: 420
+        secretName: masterPassword
+  imagePullSecrets:
+  - name: docker-secret
+  containers:
+  - name: hxe-container
+    image: "store/saplabs/hanaexpress:2.00.022.00.20171211.1"
+    ports:
+      - containerPort: 39013
+        name: port1
+      - containerPort: 39015
+        name: port2
+      - containerPort: 39017
+        name: port3
+      - containerPort: 8090
+        name: port4
+      - containerPort: 39041
+        name: port5
+      - containerPort: 59013
+        name: port6
+    args: [ "--agree-to-sap-license", "--dont-check-system", "--passwords-url", "file:///hana/hxeconfig/password.json" ]
+    volumeMounts:
+      - name: hxe-data
+        mountPath: /hana/mounts
+      - name: hxe-config
+        mountPath: /hana/hxeconfig
