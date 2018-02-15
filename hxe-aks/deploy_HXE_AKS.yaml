@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/data/hxe_pv"
+    path: /data/hxe_pv
 '---'
 kind: PersistentVolumeClaim
 apiVersion: v1
