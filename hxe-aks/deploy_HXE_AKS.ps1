@@ -5,6 +5,8 @@ $aksClusterName='aks-hxe-cluster'
 $inputKey=Read-Host '(1) West Europe
 (2) East US
 (3) Central US
+(4) Canada Central
+(5) Canada East
 Enter Azure region for AKS deployment'
 switch ($inputKey.ToUpper()) {
     1 {
@@ -15,6 +17,12 @@ switch ($inputKey.ToUpper()) {
     }
     3 {
         $azureRegion='centralus'
+    }
+    4 {
+        $azureRegion='canadacentral'
+    }
+    5 {
+        $azureRegion='canadaeast'
     }
 }
 
