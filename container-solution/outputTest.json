@@ -24,18 +24,6 @@
       "omsDataRetention": 7
     }
   },
-  "resources": [
-    {
-      "apiVersion": "[variables('apiVersion').oms]",
-      "type": "Microsoft.OperationalInsights/workspaces",
-      "name": "[variables('omsLogAnalyticsConfiguration').omsWorkspaceName]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "sku": {
-          "Name": "[variables('omsLogAnalyticsConfiguration').omsServiceTier]"
-        },
-        "retention": "[variables('omsLogAnalyticsConfiguration').omsDataRetention]"
-      },
   "outputs": {
     "workspaceId": {
       "type": "string",
