@@ -60,7 +60,6 @@ $credential=$null
 
 kubectl create -f ./secrets.yaml
 
-
 #Enter Docker account details and create docker registry secret
 $credential=Get-Credential -Title 'Enter Docker account username and password'
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($credential.Password)
