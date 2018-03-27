@@ -2,52 +2,52 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "omsWorkspaceName": {
+    "workspaceName": {
       "type": "string",
       "metadata": {
-        "description": "OMS log analytics workspace name"
+        "description": "Log Analytics workspace name"
       }
     }
   },
   "variables": {
     "apiVersion": {
-      "oms": "2017-03-15-preview",
-      "omssolutions": "2015-11-01-preview"
+      "logAnalytics": "2017-03-15-preview",
+      "logAnalyticsSolutions": "2015-11-01-preview"
     },
     "container": {
-      "name": "[concat('Containers', '(', parameters('omsWorkspaceName'), ')')]",
+      "name": "[concat('Containers', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Containers"
     },
-    "omsLogAnalyticsConfiguration": {
-      "omsWorkspaceName": "[parameters('omsWorkspaceName')]",
-      "omsServiceTier": "Free",
-      "omsDataRetention": 7
+    "logAnalyticsConfiguration": {
+      "workspaceName": "[parameters('workspaceName')]",
+      "serviceTier": "Free",
+      "dataRetention": 7
     }
   },
   "resources": [
     {
-      "apiVersion": "[variables('apiVersion').oms]",
+      "apiVersion": "[variables('apiVersion').logAnalytics]",
       "type": "Microsoft.OperationalInsights/workspaces",
-      "name": "[variables('omsLogAnalyticsConfiguration').omsWorkspaceName]",
+      "name": "[variables('logAnalyticsConfiguration').workspaceName]",
       "location": "[resourceGroup().location]",
       "properties": {
         "sku": {
-          "Name": "[variables('omsLogAnalyticsConfiguration').omsServiceTier]"
+          "Name": "[variables('logAnalyticsConfiguration').serviceTier]"
         },
-        "retention": "[variables('omsLogAnalyticsConfiguration').omsDataRetention]"
+        "retention": "[variables('logAnalyticsConfiguration').dataRetention]"
       },
       "resources": [
         {
-          "apiVersion": "[variables('apiVersion').omssolutions]",
+          "apiVersion": "[variables('apiVersion').logAnalyticsSolutions]",
           "location": "[resourceGroup().location]",
           "name": "[variables('container').name]",
           "type": "Microsoft.OperationsManagement/solutions",
           "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('container').name)]",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName)]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsConfiguration').workspaceName)]"
           ],
           "properties": {
-            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName)]"
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsConfiguration').workspaceName)]"
           },
           "plan": {
             "name": "[variables('container').name]",
@@ -62,11 +62,11 @@
   "outputs": {
     "workspaceId": {
       "type": "string",
-      "value": "[reference(concat('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName), variables('apiVersion').oms).customerId]"
+      "value": "[reference(concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsConfiguration').workspaceName), variables('apiVersion').logAnalytics).customerId]"
     },
     "primaryKey": {
       "type": "string",
-      "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName), variables('apiVersion').oms).primarySharedKey]"
+      "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsConfiguration').workspaceName), variables('apiVersion').logAnalytics).primarySharedKey]"
     }
   }
 }
