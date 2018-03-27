@@ -77,6 +77,6 @@ $BSTR=$null
 $credential=$null
 
 #HANA Express Edition deployment
-wget https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/hxe-aks/deploy_HXE_AKS.yaml
+Invoke-WebRequest https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/hxe-aks/deploy_HXE_AKS.yaml -OutFile ./deploy_HXE_AKS.yaml
 
 kubectl create -f ./deploy_HXE_AKS.yaml
