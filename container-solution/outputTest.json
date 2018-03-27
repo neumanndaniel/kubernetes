@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "omsWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "OMS log analytics workspace name"
+      }
+    }
+  },
+  "variables": {
+    "apiVersion": {
+      "oms": "2017-03-15-preview",
+      "omssolutions": "2015-11-01-preview"
+    },
+    "container": {
+      "name": "[concat('Containers', '(', parameters('omsWorkspaceName'), ')')]",
+      "galleryName": "Containers"
+    },
+    "omsLogAnalyticsConfiguration": {
+      "omsWorkspaceName": "[parameters('omsWorkspaceName')]",
+      "omsServiceTier": "Free",
+      "omsDataRetention": 7
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('apiVersion').oms]",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "name": "[variables('omsLogAnalyticsConfiguration').omsWorkspaceName]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sku": {
+          "Name": "[variables('omsLogAnalyticsConfiguration').omsServiceTier]"
+        },
+        "retention": "[variables('omsLogAnalyticsConfiguration').omsDataRetention]"
+      },
+  "outputs": {
+    "workspaceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName)]"
+    },
+    "primaryKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName), variables('apiVersion').oms).primarySharedKey]"
+    }
+  }
+}
