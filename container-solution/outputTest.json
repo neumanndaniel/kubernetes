@@ -24,6 +24,7 @@
       "omsDataRetention": 7
     }
   },
+  "resources": [],
   "outputs": {
     "workspaceId": {
       "type": "string",
