@@ -19,6 +19,7 @@
       "galleryName": "Containers"
     },
     "omsLogAnalyticsConfiguration": {
+      "omsWorkspaceName": "[parameters('omsWorkspaceName')]",
       "omsServiceTier": "Free",
       "omsDataRetention": 7
     }
@@ -27,7 +28,7 @@
     {
       "apiVersion": "[variables('apiVersion').oms]",
       "type": "Microsoft.OperationalInsights/workspaces",
-      "name": "[parameters('omsWorkspaceName')]",
+      "name": "[variables('omsLogAnalyticsConfiguration').omsWorkspaceName]",
       "location": "[resourceGroup().location]",
       "properties": {
         "sku": {
@@ -43,10 +44,10 @@
           "type": "Microsoft.OperationsManagement/solutions",
           "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('container').name)]",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('omsWorkspaceName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName)]"
           ],
           "properties": {
-            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('omsWorkspaceName'))]"
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName)]"
           },
           "plan": {
             "name": "[variables('container').name]",
@@ -57,5 +58,15 @@
         }
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "workspaceId": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName), variables('apiVersion').oms).customerId]"
+    },
+    "primaryKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName), variables('apiVersion').oms).primarySharedKey]"
+    }
+  }
 }
