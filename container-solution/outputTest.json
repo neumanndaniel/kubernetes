@@ -28,7 +28,7 @@
   "outputs": {
     "workspaceId": {
       "type": "string",
-      "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName)]"
+      "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('omsLogAnalyticsConfiguration').omsWorkspaceName, variables('apiVersion').oms).workspaceId]"
     },
     "primaryKey": {
       "type": "string",
