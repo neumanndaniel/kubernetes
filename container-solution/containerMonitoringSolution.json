@@ -7,6 +7,27 @@
       "metadata": {
         "description": "Log Analytics workspace name"
       }
+    },
+    "serviceTier": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [
+        "Free",
+        "Standalone",
+        "PerNode"
+      ],
+      "metadata": {
+        "description": "Log Analytics service tier: Free, Standalone, or PerNode"
+      }
+    },
+    "dataRetention": {
+      "type": "int",
+      "defaultValue": 7,
+      "minValue": 7,
+      "maxValue": 730,
+      "metadata": {
+        "description": "Log Analytics number of days of retention. Free plans can only have 7 days, Standalone and OMS plans include 30 days for free"
+      }
     }
   },
   "variables": {
@@ -20,8 +41,8 @@
     },
     "logAnalyticsConfiguration": {
       "workspaceName": "[parameters('workspaceName')]",
-      "serviceTier": "Free",
-      "dataRetention": 7
+      "serviceTier": "[parameters('serviceTier')]",
+      "dataRetention": "[parameters('dataRetention')]"
     }
   },
   "resources": [
