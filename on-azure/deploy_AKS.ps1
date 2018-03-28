@@ -50,10 +50,13 @@ az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku 
 #Getting ACR container registry credentials and login
 $acrCredentials=az acr credential show --resource-group $resourceGroupName --name $acrRegistryName|ConvertFrom-Json
 
-kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$acrCredentials.username --docker-password=$acrCredentials.passwords[0].value
+$dockerUsername=$acrCredentials.username
+$dockerPassword=$acrCredentials.passwords[0].value
+
+kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
 
 #Create Log Analytics workspace, add the container monitoring solution to the workspace and deploy Log Analytics agent on the AKS cluster
-$output=az group deployment create --resource-group operations-management --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose|ConvertFrom-Json
+$output=az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose|ConvertFrom-Json
 
 $workspaceId=$output.properties.outputs.workspaceId.value
 $primaryKey=$output.properties.outputs.primaryKey.value
