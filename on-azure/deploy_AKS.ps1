@@ -14,6 +14,7 @@ $inputKey=Read-Host '(1) West Europe
 (4) Canada Central
 (5) Canada East
 Enter Azure region for AKS deployment'
+
 switch ($inputKey.ToUpper()) {
     1 {
         $azureRegion='westeurope'
