@@ -1,5 +1,5 @@
 #!/bin/bash
-omsWorkspaceName='container-servicefabric'
+omsWorkspaceName=$1
 gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/output/logAnalyticsWorkspace.json'
 gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/Microsoft/OMS-docker/master/Kubernetes/omsagent-ds-secrets.yaml'
 
