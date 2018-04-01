@@ -1,10 +1,11 @@
 #!/bin/bash
 omsWorkspaceName=$1
+resourceGroupName=$2
 gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/output/logAnalyticsWorkspace.json'
 gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/Microsoft/OMS-docker/master/Kubernetes/omsagent-ds-secrets.yaml'
 
 #Get Log Analytics workspaceId and primary key, and deploy Log Analytics agent on the AKS cluster
-output=$(az group deployment create --resource-group operations-management --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose)
+output=$(az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose)
 
 workspaceId=$(echo $output|jq -r .properties.outputs.workspaceId.value)
 primaryKey=$(echo $output|jq -r .properties.outputs.primaryKey.value)
