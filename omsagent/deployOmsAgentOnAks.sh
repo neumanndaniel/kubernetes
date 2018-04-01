@@ -10,9 +10,6 @@ output=$(az group deployment create --resource-group $resourceGroupName --templa
 workspaceId=$(echo $output|jq -r .properties.outputs.workspaceId.value)
 primaryKey=$(echo $output|jq -r .properties.outputs.primaryKey.value)
 
-echo $workspaceId
-echo $primaryKey
-
 workspaceIdEncoded=$(echo $workspaceId|base64 --wrap=0)
 primaryKeyEncoded=$(echo $primaryKey|base64 --wrap=0)
 
