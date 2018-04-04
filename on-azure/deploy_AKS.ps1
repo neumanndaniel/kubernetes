@@ -36,6 +36,9 @@ switch ($inputKey.ToUpper()) {
 #Create resource group
 az group create --name $resourceGroupName --location $azureRegion --output table
 
+#Create ACR container registry
+az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku Basic --admin-enabled true --output table
+
 #Create AKS cluster
 az aks create --resource-group $resourceGroupName --name $aksClusterName --node-count 3 --node-vm-size Standard_A2_v2 --generate-ssh-keys --output table
 
@@ -43,10 +46,8 @@ az aks create --resource-group $resourceGroupName --name $aksClusterName --node-
 az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName
 
 #Deploy AKS ACI connector for Linux
+helm init
 az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
-
-#Create ACR container registry
-az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku Basic --admin-enabled $true --output table
 
 #Getting ACR container registry credentials and login
 $acrCredentials=az acr credential show --resource-group $resourceGroupName --name $acrRegistryName|ConvertFrom-Json
