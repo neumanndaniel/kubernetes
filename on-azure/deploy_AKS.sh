@@ -36,29 +36,39 @@ case $inputKey in
 esac
 
 #Create resource group
+echo '>>Creating resource group:'
 az group create --name $resourceGroupName --location $azureRegion --output table
 
+#Create ACR container registry
+echo '>>Creating ACR container registry:'
+az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku Basic --admin-enabled true --output table
+
 #Create AKS cluster
+echo '>>Creating AKS cluster:'
 az aks create --resource-group $resourceGroupName --name $aksClusterName --node-count 3 --node-vm-size Standard_A2_v2 --generate-ssh-keys --output table
 
 #Getting AKS cluster credentials
+echo '>>Getting AKS cluster credentials:'
 az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName
 
 #Deploy AKS ACI connector for Linux
+echo '>>Deploying ACI connector for Linux to AKS cluster:'
+helm init
+sleep 10
 az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
-#Create ACR container registry
-az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku Basic --admin-enabled $true --output table
-
 #Getting ACR container registry credentials and login
+echo '>>Getting ACR container registry credentials and create Kubernetes secret for ACR:'
 acrCredentials=$(az acr credential show --resource-group $resourceGroupName --name $acrRegistryName)
 
+acrUri=$(echo $acrRegistryName.azurecr.io)
 dockerUsername=$(echo $acrCredentials|jq -r .username)
 dockerPassword=$(echo $acrCredentials|jq -r .passwords[0].value)
 
 kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
 
 #Create Log Analytics workspace, add the container monitoring solution to the workspace and deploy Log Analytics agent on the AKS cluster
+echo '>>Creating Log Analytics workspace and deploy OMS agent to AKS cluster:'
 output=$(az group deployment create --resource-group operations-management --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose)
 
 workspaceId=$(echo $output|jq -r .properties.outputs.workspaceId.value)
