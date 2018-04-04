@@ -47,11 +47,13 @@ az aks get-credentials --resource-group $resourceGroupName --name $aksClusterNam
 
 #Deploy AKS ACI connector for Linux
 helm init
+Start-Sleep -Seconds 10
 az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
 #Getting ACR container registry credentials and login
 $acrCredentials=az acr credential show --resource-group $resourceGroupName --name $acrRegistryName|ConvertFrom-Json
 
+$acrUri=$acrRegistryName+'azurecr.io'
 $dockerUsername=$acrCredentials.username
 $dockerPassword=$acrCredentials.passwords[0].value
 
