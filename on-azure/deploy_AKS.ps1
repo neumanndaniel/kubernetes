@@ -43,7 +43,7 @@ az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku 
 
 #Create AKS cluster
 Write-Output '>>Creating AKS cluster:'
-az aks create --resource-group $resourceGroupName --name $aksClusterName --node-count 3 --node-vm-size Standard_A2_v2 --generate-ssh-keys --output table
+az aks create --resource-group $resourceGroupName --name $aksClusterName --node-count 1 --node-vm-size Standard_A2_v2 --generate-ssh-keys --output table
 
 #Getting AKS cluster credentials
 Write-Output '>>Getting AKS cluster credentials:'
@@ -52,7 +52,8 @@ az aks get-credentials --resource-group $resourceGroupName --name $aksClusterNam
 #Deploy AKS ACI connector for Linux
 Write-Output '>>Deploying ACI connector for Linux to AKS cluster:'
 helm init
-Start-Sleep -Seconds 10
+Write-Output '>>Waiting 30 seconds to spin up tiller pod:'
+Start-Sleep -Seconds 30
 az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
 #Getting ACR container registry credentials and login
