@@ -54,8 +54,8 @@ az aks get-credentials --resource-group $resourceGroupName --name $aksClusterNam
 #Deploy AKS ACI connector for Linux
 echo '>>Deploying ACI connector for Linux to AKS cluster:'
 helm init
-sleep 30
 echo '>>Waiting 30 seconds to spin up tiller pod:'
+sleep 30
 az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
 #Getting ACR container registry credentials and login
