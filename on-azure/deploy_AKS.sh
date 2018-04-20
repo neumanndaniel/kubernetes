@@ -52,11 +52,11 @@ echo '>>Getting AKS cluster credentials:'
 az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName
 
 #Deploy AKS ACI connector for Linux
-echo '>>Deploying ACI connector for Linux to AKS cluster:'
-helm init
-echo '>>Waiting 30 seconds to spin up tiller pod:'
-sleep 30
-az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
+#echo '>>Deploying ACI connector for Linux to AKS cluster:'
+#helm init
+#echo '>>Waiting 30 seconds to spin up tiller pod:'
+#sleep 30
+#az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
 #Getting ACR container registry credentials and login
 echo '>>Getting ACR container registry credentials and create Kubernetes secret for ACR:'
