@@ -66,16 +66,16 @@ acrUri=$(echo $acrRegistryName.azurecr.io)
 dockerUsername=$(echo $acrCredentials|jq -r .username)
 dockerPassword=$(echo $acrCredentials|jq -r .passwords[0].value)
 
-kubectl apply secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
+kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
 
 #Create Log Analytics workspace, add the container monitoring solution to the workspace and deploy Log Analytics agent on the AKS cluster
 echo '>>Creating Log Analytics workspace and deploy OMS agent to AKS cluster:'
-output=$(az group deployment create --resource-group operations-management --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose)
+output=$(az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose)
 
 workspaceId=$(echo $output|jq -r .properties.outputs.workspaceId.value)
 primaryKey=$(echo $output|jq -r .properties.outputs.primaryKey.value)
 
-kubectl apply secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey
+kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey
 
 wget $gitHubLogAnalyticsAgentUri --output-document=oms-daemonset.yaml
 
