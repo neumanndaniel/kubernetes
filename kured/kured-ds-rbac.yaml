@@ -31,7 +31,7 @@ spec:
       serviceAccountName: kured
       containers:
         - name: kured
-          image: quay.io/weaveworks/kured:1.0.0
+          image: quay.io/weaveworks/kured:master-b27aaa1
           imagePullPolicy: Always
           command:
             - /usr/bin/kured
