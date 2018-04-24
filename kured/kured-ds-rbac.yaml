@@ -32,7 +32,7 @@ spec:
       containers:
         - name: kured
           image: quay.io/weaveworks/kured:1.0.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command:
             - /usr/bin/kured
           env:
