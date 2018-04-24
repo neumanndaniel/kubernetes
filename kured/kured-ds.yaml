@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: kured
-  namespace: kube-system
+  name: kured        # Must match `--ds-name`
+  namespace: default # Must match `--ds-namespace`
 spec:
   template:
     metadata:
@@ -12,9 +12,15 @@ spec:
       containers:
         - name: kured
           image: quay.io/weaveworks/kured:master-b27aaa1
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command:
             - /usr/bin/kured
+          args:
+            - --ds-name=kured
+            - --ds-namespace=default
+            - --lock-annotation=weave.works/kured-node-lock
+            - --period=1h
+            - --reboot-sentinel=/var/run/reboot-required
           env:
             - name: KURED_NODE_ID
               valueFrom:
