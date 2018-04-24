@@ -32,7 +32,7 @@ spec:
       containers:
         - name: kured
           image: quay.io/weaveworks/kured:master-b27aaa1
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command:
             - /usr/bin/kured
           args:
