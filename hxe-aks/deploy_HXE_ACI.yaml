@@ -36,7 +36,7 @@ spec:
         name: port5
       - containerPort: 59013
         name: port6
-    args: [ "--agree-to-sap-license", "--dont-check-system", "--passwords-url", "file:///hana/hxeconfig/password.json" ]
+    args: [ "/bin/bash /run_hana --agree-to-sap-license --dont-check-system --passwords-url file:///hana/hxeconfig/password.json" ]
     volumeMounts:
       - name: hxe-config
         mountPath: /hana/hxeconfig
