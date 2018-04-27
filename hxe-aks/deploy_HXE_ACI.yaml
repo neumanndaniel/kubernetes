@@ -24,18 +24,8 @@ spec:
         memory: 14G
         cpu: 4
     ports:
-      - containerPort: 39013
-        name: port1
-      - containerPort: 39015
-        name: port2
-      - containerPort: 39017
-        name: port3
       - containerPort: 8090
-        name: port4
-      - containerPort: 39041
-        name: port5
-      - containerPort: 59013
-        name: port6
+        name: port1
     args: [ "/bin/bash /run_hana --agree-to-sap-license --dont-check-system --passwords-url file:///hana/hxeconfig/password.json" ]
     volumeMounts:
       - name: hxe-config
