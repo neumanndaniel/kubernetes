@@ -15,7 +15,7 @@ spec:
   - name: docker-secret
   containers:
   - name: hxe-pod-aci
-    image: "store/saplabs/hanaexpress:2.00.030.00.20180403.2"
+    image: "azstcr1.azurecr.io/store/saplabs/hanaexpress:2.00.030.00.20180403.2"
     resources:
       requests:
         memory: 14G
