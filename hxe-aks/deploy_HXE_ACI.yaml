@@ -71,7 +71,7 @@ spec:
       - name: hxe-config
         mountPath: /hana/hxeconfig
   dnsPolicy: ClusterFirst
-  nodeName: virtual-kubelet-azcdmdnaciconnector-linux
+  nodeName: virtual-kubelet-hxe-linux
   tolerations:
   - key: azure.com/aci
     effect: NoSchedule
