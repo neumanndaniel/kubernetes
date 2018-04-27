@@ -48,11 +48,11 @@ spec:
   - name: docker-secret
   containers:
   - name: hxe-pod-aci
-    image: "store/saplabs/hanaexpress:2.00.022.00.20171211.1"
+    image: "store/saplabs/hanaexpress:2.00.030.00.20180403.2"
     resources:
       requests:
-        memory: 1.5G
-        cpu: 1
+        memory: 14G
+        cpu: 4
     ports:
       - containerPort: 39013
         name: port1
@@ -66,7 +66,7 @@ spec:
         name: port5
       - containerPort: 59013
         name: port6
-    args: [ "--agree-to-sap-license", "--dont-check-system", "--passwords-url", "file:///hana/hxeconfig/password.json" ]
+    args: [ "--agree-to-sap-license", "--dont-check-system", "--passwords-url", "file:///hana/hxeconfig/masterPassword.json" ]
     volumeMounts:
       - name: hxe-config
         mountPath: /hana/hxeconfig
