@@ -20,6 +20,9 @@ spec:
       requests:
         memory: 14G
         cpu: 4
+      limits:
+        memory: 14G
+        cpu: 4
     ports:
       - containerPort: 39013
         name: port1
