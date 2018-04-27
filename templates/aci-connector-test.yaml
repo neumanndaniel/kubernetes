@@ -9,7 +9,7 @@ spec:
     name: helloworld
     resources:
       requests:
-        memory: 1G
+        memory: 1.5G
         cpu: 1
     ports:
     - containerPort: 80
