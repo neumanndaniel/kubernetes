@@ -8,10 +8,9 @@ spec:
   restartPolicy: OnFailure
   volumes:
     - name: hxe-config
-      azureFile:
-        secretName: azure-secret
-        shareName: hxe-config
-        readOnly: false
+      secret:
+        defaultMode: 420
+        secretName: masterpassword
   imagePullSecrets:
   - name: docker-secret
   containers:
@@ -34,7 +33,7 @@ spec:
         name: port5
       - containerPort: 59013
         name: port6
-    args: [ "--agree-to-sap-license", "--dont-check-system", "--passwords-url", "file:///hana/hxeconfig/masterPassword.json" ]
+    args: [ "--agree-to-sap-license", "--dont-check-system", "--passwords-url", "file:///hana/hxeconfig/password.json" ]
     volumeMounts:
       - name: hxe-config
         mountPath: /hana/hxeconfig
