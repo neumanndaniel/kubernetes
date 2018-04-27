@@ -27,7 +27,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Ti
+      storage: 50Gi
   selector:
     matchLabels:
       usage: azure-files
