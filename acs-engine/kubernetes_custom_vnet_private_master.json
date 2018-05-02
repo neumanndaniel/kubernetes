@@ -52,9 +52,6 @@
         "osDiskSizeGB": 32,
         "distro": "ubuntu",
         "storageProfile": "ManagedDisks",
-        "diskSizesGB": [
-          32
-        ],
         "availabilityProfile": "AvailabilitySet",
         "vnetSubnetId": "/subscriptions/REDACTED/resourceGroups/acs-engine/providers/Microsoft.Network/virtualNetworks/acs-engine/subnets/k8s"
       }
