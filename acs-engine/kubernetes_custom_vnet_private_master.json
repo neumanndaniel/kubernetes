@@ -1,0 +1,73 @@
+{
+  "apiVersion": "vlabs",
+  "properties": {
+    "orchestratorProfile": {
+      "orchestratorType": "Kubernetes",
+      "orchestratorRelease": "1.10",
+      "kubernetesConfig": {
+        "useManagedIdentity": true,
+        "networkPolicy": "azure",
+        "containerRuntime": "docker",
+        "enableRbac": true,
+        "maxPods":30,
+        "useInstanceMetadata": true,
+        "addons": [
+          {
+            "name": "tiller",
+            "enabled": true
+          },
+          {
+            "name": "kubernetes-dashboard",
+            "enabled": true
+          }
+        ],
+        "privateCluster": {
+          "enabled": true,
+          "jumpboxProfile": {
+            "name": "azst-acse1-jb",
+            "vmSize": "Standard_A2_v2",
+            "osDiskSizeGB": 32,
+            "storageProfile": "ManagedDisks",
+            "username": "azureuser",
+            "publicKey": "REDACTED"
+          }
+        }
+      }
+    },
+    "masterProfile": {
+      "count": 1,
+      "dnsPrefix": "azst-acse1",
+      "vmSize": "Standard_A2_v2",
+      "osDiskSizeGB": 32,
+      "distro": "ubuntu",
+      "vnetSubnetId": "/subscriptions/REDACTED/resourceGroups/acs-engine/providers/Microsoft.Network/virtualNetworks/acs-engine/subnets/k8s",
+      "firstConsecutiveStaticIP": "172.16.15.239",
+      "vnetCIDR": "172.16.0.0/16"
+    },
+    "agentPoolProfiles": [
+      {
+        "name": "agentpool",
+        "count": 3,
+        "vmSize": "Standard_A2_v2",
+        "osDiskSizeGB": 32,
+        "distro": "ubuntu",
+        "storageProfile": "ManagedDisks",
+        "diskSizesGB": [
+          32
+        ],
+        "availabilityProfile": "AvailabilitySet",
+        "vnetSubnetId": "/subscriptions/REDACTED/resourceGroups/acs-engine/providers/Microsoft.Network/virtualNetworks/acs-engine/subnets/k8s"
+      }
+    ],
+    "linuxProfile": {
+      "adminUsername": "azureuser",
+      "ssh": {
+        "publicKeys": [
+          {
+            "keyData": "REDACTED"
+          }
+        ]
+      }
+    }
+  }
+}
