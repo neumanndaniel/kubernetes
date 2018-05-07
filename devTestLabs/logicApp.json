@@ -16,8 +16,9 @@
             "connections_azureautomation_name": "azureautomation",
             "connections_azureeventgrid_name": "azureeventgrid",
             "workflows_Provisioning_name": "Provisioning",
-            "workflows_Provisioning_path": "[concat('/subscriptions/@{encodeURIComponent(',subscription().subscriptionId,')}/resourceGroups/@{encodeURIComponent(',parameters('resourceGroupName'),')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(','AutomationDTL',')}/jobs')]",
-            "workflows_Provisioning_topic": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('resourceGroupName'))]"
+            "workflows_Provisioning_path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,subscription().subscriptionId,variables('deploymentConfiguration').singlequote,')}/resourceGroups/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,parameters('resourceGroupName'),variables('deploymentConfiguration').singlequote,')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,'AutomationDTL',variables('deploymentConfiguration').singlequote,')}/jobs')]",
+            "workflows_Provisioning_topic": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('resourceGroupName'))]",
+            "singlequote": "'"
         }
     },
     "resources": [
@@ -60,7 +61,7 @@
                                         "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
                                     }
                                 },
-                                "path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').subscriptionId,')}/providers/@{encodeURIComponent(','Microsoft.Resources.resourceGroups',')}/resource/eventSubscriptions')]",
+                                "path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,variables('deploymentConfiguration').subscriptionId,variables('deploymentConfiguration').singlequote,')}/providers/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,'Microsoft.Resources.resourceGroups',variables('deploymentConfiguration').singlequote,')}/resource/eventSubscriptions')]",
                                 "queries": {
                                     "subscriptionName": "DTL",
                                     "x-ms-api-version": "2017-06-15-preview"
