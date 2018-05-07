@@ -2,7 +2,7 @@ Param
 (
     [Parameter(Mandatory = $true, HelpMessage = 'Azure Key Vault name')]
     [String]
-    $keyVaultName="/subscriptions/05499249-2bf5-4767-b121-db90943e363e/resourcegroups/dtlsession/providers/Microsoft.KeyVault/vaults/dtlsession5ff97113"
+    $keyVaultName
 )
 
 #Variables section
