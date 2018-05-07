@@ -1,0 +1,165 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "apiVersion": {
+            "logicApp": "2017-07-01",
+            "webConnections": "2016-06-01"
+        },
+        "deploymentConfiguration": {
+            "subscriptionId": "[subscription().subscriptionId]",
+            "connections_azureautomation_name": "azureautomation",
+            "connections_azureeventgrid_name": "azureeventgrid",
+            "workflows_Provisioning_name": "Provisioning",
+            "workflows_Provisioning_path": "[concat('/subscriptions/@{encodeURIComponent(',subscription().subscriptionId,')}/resourceGroups/@{encodeURIComponent(',parameters('resourceGroupName'),')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(','AutomationDTL',')}/jobs')]",
+            "workflows_Provisioning_topic": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('resourceGroupName'))]"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion').logicApp]",
+            "type": "Microsoft.Logic/workflows",
+            "name": "[variables('deploymentConfiguration').workflows_Provisioning_name]",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "state": "Disabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_a_resource_event_occurs": {
+                            "splitOn": "@triggerBody()",
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "properties": {
+                                        "destination": {
+                                            "endpointType": "webhook",
+                                            "properties": {
+                                                "endpointUrl": "@{listCallbackUrl()}"
+                                            }
+                                        },
+                                        "topic": "[variables('deploymentConfiguration').workflows_Provisioning_topic]"
+                                    }
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+                                    }
+                                },
+                                "path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').subscriptionId,')}/providers/@{encodeURIComponent(','Microsoft.Resources.resourceGroups',')}/resource/eventSubscriptions')]",
+                                "queries": {
+                                    "subscriptionName": "DTL",
+                                    "x-ms-api-version": "2017-06-15-preview"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "Condition_2": {
+                                    "actions": {
+                                        "Create_job": {
+                                            "runAfter": {},
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "body": {
+                                                    "properties": {
+                                                        "parameters": {
+                                                            "KeyVaultName": "@triggerBody()?['subject']"
+                                                        }
+                                                    }
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureautomation']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "put",
+                                                "path": "[variables('deploymentConfiguration').workflows_Provisioning_path]",
+                                                "queries": {
+                                                    "runbookName": "[concat('Secret', variables('deploymentConfiguration').workflows_Provisioning_name)]",
+                                                    "wait": false,
+                                                    "x-ms-api-version": "2015-10-31"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {},
+                                    "expression": "@contains(triggerBody()?['data']['claims']['appid'], '1a14be2a-e903-4cec-99cf-b2e209259a0f')",
+                                    "type": "If"
+                                }
+                            },
+                            "runAfter": {},
+                            "expression": "@equals(triggerBody()?['data']['operationName'], 'Microsoft.KeyVault/vaults/write')",
+                            "type": "If"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureautomation": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('deploymentConfiguration').connections_azureautomation_name)]",
+                                "connectionName": "azureautomation",
+                                "id": "/subscriptions/05499249-2bf5-4767-b121-db90943e363e/providers/Microsoft.Web/locations/northeurope/managedApis/azureautomation"
+                            },
+                            "azureeventgrid": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('deploymentConfiguration').connections_azureeventgrid_name)]",
+                                "connectionName": "azureeventgrid",
+                                "id": "/subscriptions/05499249-2bf5-4767-b121-db90943e363e/providers/Microsoft.Web/locations/northeurope/managedApis/azureeventgrid"
+                            }
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', variables('deploymentConfiguration').connections_azureautomation_name)]",
+                "[resourceId('Microsoft.Web/connections', variables('deploymentConfiguration').connections_azureeventgrid_name)]"
+            ]
+        },
+        {
+            "apiVersion": "[variables('apiVersion').webConnections]",
+            "type": "Microsoft.Web/connections",
+            "name": "[variables('deploymentConfiguration').connections_azureautomation_name]",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "displayName": "azureAutomation",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat(subscription().id,'/providers/Microsoft.Web/locations/',resourceGroup().location,'/managedApis/', variables('deploymentConfiguration').connections_azureautomation_name)]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').webConnections]",
+            "type": "Microsoft.Web/connections",
+            "name": "[variables('deploymentConfiguration').connections_azureeventgrid_name]",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "displayName": "azureEventGrid",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat(subscription().id,'/providers/Microsoft.Web/locations/',resourceGroup().location,'/managedApis/', variables('deploymentConfiguration').connections_azureeventgrid_name)]"
+                }
+            }
+        }
+    ]
+}
