@@ -4,6 +4,9 @@
     "parameters": {
         "resourceGroupName": {
             "type": "string"
+        },
+        "automationAccountName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -17,7 +20,9 @@
             "connections_azureeventgrid_name": "azureeventgrid",
             "workflows_Provisioning_name": "Provisioning",
             "workflows_Provisioning_topic": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('resourceGroupName'))]",
-            "singlequote": "'"
+            "singlequote": "'",
+            "resourceGroupName": "[parameters('resourceGroupName')]",
+            "automationAccountName": "[parameters('automationAccountName')]"
         }
     },
     "resources": [
@@ -90,7 +95,7 @@
                                                     }
                                                 },
                                                 "method": "put",
-                                                "path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,subscription().subscriptionId,variables('deploymentConfiguration').singlequote,')}/resourceGroups/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,parameters('resourceGroupName'),variables('deploymentConfiguration').singlequote,')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,'AutomationDTL',variables('deploymentConfiguration').singlequote,')}/jobs')]",
+                                                "path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,subscription().subscriptionId,variables('deploymentConfiguration').singlequote,')}/resourceGroups/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,variables('deploymentConfiguration').resourceGroupName,variables('deploymentConfiguration').singlequote,')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,variables('deploymentConfiguration').automationAccountName,variables('deploymentConfiguration').singlequote,')}/jobs')]",
                                                 "queries": {
                                                     "runbookName": "[concat('secret', variables('deploymentConfiguration').workflows_Provisioning_name)]",
                                                     "wait": false,
