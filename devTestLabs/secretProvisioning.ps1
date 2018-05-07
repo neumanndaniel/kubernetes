@@ -55,7 +55,8 @@ catch {
 
 #Set Azure Automation service principal access on target Key Vault
 try {
-    Set-AzureRmKeyVaultAccessPolicy -VaultName $targetKeyVaultName -ServicePrincipalName $servicePrincipalConnection.ApplicationId -PermissionsToSecrets all
+    $secretPermissions = 'backup', 'delete', 'get', 'list', 'recover', 'restore', 'set'
+    Set-AzureRmKeyVaultAccessPolicy -VaultName $targetKeyVaultName -ServicePrincipalName $servicePrincipalConnection.ApplicationId -PermissionsToSecrets $secretPermissions
 }
 catch {
     Write-Output 'ERROR:'
