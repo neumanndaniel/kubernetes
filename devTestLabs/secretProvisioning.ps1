@@ -2,7 +2,7 @@ Param
 (
     [Parameter(Mandatory = $true, HelpMessage = 'Azure Key Vault name')]
     [String]
-    $keyVaultName
+    $keyVaultName="/subscriptions/05499249-2bf5-4767-b121-db90943e363e/resourcegroups/dtlsession/providers/Microsoft.KeyVault/vaults/dtlsession5ff97113"
 )
 
 #Variables section
@@ -41,9 +41,10 @@ catch {
 try {
     $keyVaults = (Get-AzureRmKeyVault -ResourceGroupName $resourceGroupName).VaultName
     $sourceKeyVaultName = $null
-    for ($i = 0; $i -lt $keyVaults.Length; $i++) {
-        if ($keyVaults[$i].Length -lt $keyVaults[$i + 1].Length -or $keyVaults[$i + 1].Length -lt $keyVaults[$i].Length) {
-            $sourceKeyVaultName = $keyVaults[$i]
+    foreach($item in $keyVaults) {
+        $temp=$item -replace "[a-z]"
+        if($temp.length -eq 4) {
+            $sourceKeyVaultName = $item
         }
     }
 }
