@@ -5,7 +5,7 @@ aksAciConnectorName='aciconnector'
 acrRegistryName='aksdemoacr'
 omsWorkspaceName='aks-demo-oms'
 gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/operationsmanagement/containerMonitoringSolution.json'
-gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/Microsoft/OMS-docker/master/Kubernetes/omsagent-ds-secrets.yaml'
+gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/omsagent/oms-daemonset.yaml'
 dockerEmail='AKS@AzureRM'
 
 echo '(1) West Europe
