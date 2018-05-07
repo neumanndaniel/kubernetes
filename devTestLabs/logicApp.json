@@ -16,7 +16,6 @@
             "connections_azureautomation_name": "azureautomation",
             "connections_azureeventgrid_name": "azureeventgrid",
             "workflows_Provisioning_name": "Provisioning",
-            "workflows_Provisioning_path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,subscription().subscriptionId,variables('deploymentConfiguration').singlequote,')}/resourceGroups/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,parameters('resourceGroupName'),variables('deploymentConfiguration').singlequote,')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,'AutomationDTL',variables('deploymentConfiguration').singlequote,')}/jobs')]",
             "workflows_Provisioning_topic": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('resourceGroupName'))]",
             "singlequote": "'"
         }
@@ -91,7 +90,7 @@
                                                     }
                                                 },
                                                 "method": "put",
-                                                "path": "[variables('deploymentConfiguration').workflows_Provisioning_path]",
+                                                "path": "[concat('/subscriptions/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,subscription().subscriptionId,variables('deploymentConfiguration').singlequote,')}/resourceGroups/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,parameters('resourceGroupName'),variables('deploymentConfiguration').singlequote,')}/providers/Microsoft.Automation/automationAccounts/@{encodeURIComponent(',variables('deploymentConfiguration').singlequote,'AutomationDTL',variables('deploymentConfiguration').singlequote,')}/jobs')]",
                                                 "queries": {
                                                     "runbookName": "[concat('Secret', variables('deploymentConfiguration').workflows_Provisioning_name)]",
                                                     "wait": false,
