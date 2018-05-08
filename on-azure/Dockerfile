@@ -18,7 +18,6 @@ ENV PATH=/usr/local/go/bin:$PATH
 WORKDIR /webapp
 ADD /go-webapp .
 
-
 RUN go build .
 
 ENTRYPOINT ./webapp
