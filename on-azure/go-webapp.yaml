@@ -14,11 +14,9 @@ spec:
       labels:
         app: go-webapp
     spec:
-      imagePullSecrets:
-        - name: aksdemoacr
       containers:
       - name: go-webapp
-        image: aksdemoacr.azurecr.io/aksgowebapp:latest
+        image: aksdemoacr.azurecr.io/go-webapp:latest
         ports:
         - containerPort: 80
         resources:
