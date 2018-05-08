@@ -59,14 +59,20 @@ az aks get-credentials --resource-group $resourceGroupName --name $aksClusterNam
 #az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
 #Getting ACR container registry credentials and login
-echo '>>Getting ACR container registry credentials and create Kubernetes secret for ACR:'
-acrCredentials=$(az acr credential show --resource-group $resourceGroupName --name $acrRegistryName)
+#echo '>>Getting ACR container registry credentials and create Kubernetes secret for ACR:'
+#acrCredentials=$(az acr credential show --resource-group $resourceGroupName --name $acrRegistryName)
 
-acrUri=$(echo $acrRegistryName.azurecr.io)
-dockerUsername=$(echo $acrCredentials|jq -r .username)
-dockerPassword=$(echo $acrCredentials|jq -r .passwords[0].value)
+#acrUri=$(echo $acrRegistryName.azurecr.io)
+#dockerUsername=$(echo $acrCredentials|jq -r .username)
+#dockerPassword=$(echo $acrCredentials|jq -r .passwords[0].value)
 
-kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
+#kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
+
+#Assigning AKS Service Principal the reader role on ACR
+clientId=$(az aks show --resource-group $resourceGroupName --name $aksClusterName --query "servicePrincipalProfile.clientId" --output tsv)
+acrId=$(az acr show --resource-group $resourceGroupName --name $acrRegistryName --query "id" --output tsv)
+
+az role assignment create --assignee $clientId --role Reader --scope $acrId --verbose --output table
 
 #Create Log Analytics workspace, add the container monitoring solution to the workspace and deploy Log Analytics agent on the AKS cluster
 echo '>>Creating Log Analytics workspace and deploy OMS agent to AKS cluster:'
