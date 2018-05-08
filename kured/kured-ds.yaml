@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: kured        # Must match `--ds-name`
-  namespace: default # Must match `--ds-namespace`
+  namespace: kube-system # Must match `--ds-namespace`
 spec:
   template:
     metadata:
@@ -17,7 +17,7 @@ spec:
             - /usr/bin/kured
           args:
             - --ds-name=kured
-            - --ds-namespace=default
+            - --ds-namespace=kube-system
             - --lock-annotation=weave.works/kured-node-lock
             - --period=1h
             - --reboot-sentinel=/var/run/reboot-required
