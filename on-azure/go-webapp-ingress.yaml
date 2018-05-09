@@ -1,0 +1,52 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: go-webapp-ingress
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: go-webapp-ingress
+    spec:
+      containers:
+      - name: go-webapp-ingress
+        image: aksdemoacr.azurecr.io/go-webapp:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-webapp-ingress
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: go-webapp-ingress
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: go-webapp-ingress
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+  - host: go-webapp-ingress.<CLUSTER_SPECIFIC_DNS_ZONE>
+    http:
+      paths:
+      - backend:
+          serviceName: go-webapp-ingress
+          servicePort: 80
+        path: /
