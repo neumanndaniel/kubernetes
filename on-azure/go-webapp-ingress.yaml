@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: go-webapp-ingress
-        image: aksdemoacr.azurecr.io/go-webapp:latest
+        image: azstcr1.azurecr.io/go-webapp:latest
         ports:
         - containerPort: 80
         resources:
@@ -43,7 +43,7 @@ metadata:
     kubernetes.io/ingress.class: addon-http-application-routing
 spec:
   rules:
-  - host: go-webapp-ingress.<CLUSTER_SPECIFIC_DNS_ZONE>
+  - host: go-webapp-ingress.4a440f52-bb08-4232-af3f-b52c08671087.westeurope.aksapp.io
     http:
       paths:
       - backend:
