@@ -4,7 +4,7 @@ $aksClusterName='aks-demo-cluster'
 $aksAciConnectorName='aciconnector'
 $acrRegistryName='aksdemoacr'
 $omsWorkspaceName='aks-demo-oms'
-$gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/operationsmanagement/containerMonitoringSolution.json'
+$gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/operationsmanagement/aksMonitoringSolution.json'
 $gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/omsagent/oms-daemonset.yaml'
 $dockerEmail='AKS@AzureRM'
 
@@ -79,7 +79,7 @@ $output=az group deployment create --resource-group $resourceGroupName --templat
 $workspaceId=$output.properties.outputs.workspaceId.value
 $primaryKey=$output.properties.outputs.primaryKey.value
 
-kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey
+kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey --namespace kube-system
 
 Invoke-WebRequest $gitHubLogAnalyticsAgentUri -OutFile ./oms-daemonset.yaml
 
