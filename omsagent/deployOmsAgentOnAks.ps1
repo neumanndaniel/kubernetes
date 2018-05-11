@@ -26,7 +26,7 @@ data:
 kind: Secret
 metadata:
   name: omsagent-secret
-  namespace: default
+  namespace: kube-system
 type: Opaque'
 
 Write-Output $yamlDefinition > omsagent-secret.yaml
