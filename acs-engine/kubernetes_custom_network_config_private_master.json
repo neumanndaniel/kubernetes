@@ -7,7 +7,7 @@
       "kubernetesConfig": {
         "useManagedIdentity": true,
         "kubeletConfig": {
-          "--non-masquerade-cidr": "172.16.0.0/16"
+          "--non-masquerade-cidr": "172.16.0.0/20"
         },
         "clusterSubnet": "172.16.0.0/20",
         "dnsServiceIP": "172.16.16.10",
