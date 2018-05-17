@@ -41,6 +41,10 @@ Do {
     $automationModule = Get-AzureRmAutomationModule -ResourceGroupName $resourceGroupName -AutomationAccountName $name -Name 'AzureRm.profile'
 }While ($automationModule.ProvisioningState -eq 'Succeeded')
 
+Write-Output '>>AzureRm.profile module has been successfully imported!'
+
+Write-Output '>>Sleeping 30 seconds...'
+Start-Sleep 30
 New-AzureRmAutomationModule -ResourceGroupName $resourceGroupName -AutomationAccountName $name -Name 'AzureRm.keyvault' -ContentLink 'https://www.powershellgallery.com/api/v2/package/AzureRm.keyvault/5.0.0'
 
 #Import secretProvisioning.ps1
