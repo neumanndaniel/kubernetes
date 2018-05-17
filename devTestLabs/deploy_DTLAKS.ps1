@@ -30,22 +30,10 @@ Do {
 
 Write-Output '>>Automation run as account has been successfully created!'
 
-#Import necessary Azure PowerShell modules AzureRm.profile and AzureRm.keyvault
-Write-Output '>>Importing the Azure PowerShell modules AzureRm.profile and AzureRm.keyvault'
+#Import necessary Azure PowerShell module AzureRm.profile
+Write-Output '>>Importing the Azure PowerShell module AzureRm.profile'
 New-AzureRmAutomationModule -ResourceGroupName $resourceGroupName -AutomationAccountName $name -Name 'AzureRm.profile' -ContentLink 'https://www.powershellgallery.com/api/v2/package/AzureRm.profile/5.0.1'
-
-Do {
-    Write-Output '>>Sleeping 30 seconds...'
-    Start-Sleep 30
-    Write-Output '>>Checking if AzureRm.profile module has been imported successfully...'
-    $automationModule = Get-AzureRmAutomationModule -ResourceGroupName $resourceGroupName -AutomationAccountName $name -Name 'AzureRm.profile'
-}While ($automationModule.ProvisioningState -eq 'Succeeded')
-
 Write-Output '>>AzureRm.profile module has been successfully imported!'
-
-Write-Output '>>Sleeping 30 seconds...'
-Start-Sleep 30
-New-AzureRmAutomationModule -ResourceGroupName $resourceGroupName -AutomationAccountName $name -Name 'AzureRm.keyvault' -ContentLink 'https://www.powershellgallery.com/api/v2/package/AzureRm.keyvault/5.0.0'
 
 #Import secretProvisioning.ps1
 Write-Output '>>Import secretProvisioning.ps1 runbook...'
@@ -80,3 +68,8 @@ $kubernetesServicePrincipal = $null
 #Depoy Logic App workflow
 Write-Output '>>Creating Logic App workflow:'
 $output = az group deployment create --resource-group $resourceGroupName --template-uri $gitHubLogicAppWorkflowUri --parameters resourceGroupName=$resourceGroupName automationAccountName=$name --verbose|ConvertFrom-Json
+
+#Import necessary Azure PowerShell module AzureRm.keyvault
+Write-Output '>>Importing the Azure PowerShell module AzureRm.keyvault'
+New-AzureRmAutomationModule -ResourceGroupName $resourceGroupName -AutomationAccountName $name -Name 'AzureRm.keyvault' -ContentLink 'https://www.powershellgallery.com/api/v2/package/AzureRm.keyvault/5.0.0'
+Write-Output '>>AzureRm.keyvault module has been successfully imported!'
