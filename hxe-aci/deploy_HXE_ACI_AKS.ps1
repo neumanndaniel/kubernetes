@@ -1,5 +1,5 @@
 #Variables for HXE ACI deployment
-$registryLoginServer='https://registry-1.docker.io/v2/'
+$registryLoginServer='registry-1.docker.io'
 $gitHubAciHxeAksUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/hxe-aci/deploy_HXE_ACI.yaml'
 
 #Prepare deployment files and create master password secret
