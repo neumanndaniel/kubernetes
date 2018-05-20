@@ -29,11 +29,11 @@ spec:
       - containerPort: 39015
         name: port2
       - containerPort: 39017
-        name: port2
+        name: port3
       - containerPort: 39041
-        name: port2
+        name: port4
       - containerPort: 59013
-        name: port2
+        name: port5
     args: [ "/bin/bash", "-c", "/run_hana --agree-to-sap-license --dont-check-system --passwords-url file:///hana/hxeconfig/masterPassword.json" ]
     volumeMounts:
       - name: hxe-config
