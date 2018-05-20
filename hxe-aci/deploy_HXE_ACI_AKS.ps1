@@ -45,4 +45,4 @@ $credential=$null
 #HANA Express Edition deployment
 wget $gitHubAciHxeAksUri
 
-kubectl apply -f ./deploy_HXE_AKS.yaml
+kubectl apply -f ./deploy_HXE_ACI.yaml
