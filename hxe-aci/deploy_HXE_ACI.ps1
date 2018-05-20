@@ -46,7 +46,7 @@ $storageAccountName=(New-Guid).Guid
 $storageAccountName=$storageAccountName -replace "-",""
 $storageAccountName=$storageAccountName.Substring(0,20)
 
-az storage account create --name $storageAccountName --resource-group $resourceGroupName --kind StorageV2 --sku Standard_LRS --https-only true --encryption-services blob,file
+az storage account create --name $storageAccountName --resource-group $resourceGroupName --kind StorageV2 --sku Standard_LRS --https-only true --encryption-services blob file
 az storage share create --name $fileShareName --account-name $storageAccountName
 az storage file upload --share-name $fileShareName --account-name $storageAccountName --source ./masterPassword.json
 $storageAccountKeys = az storage account keys list --account-name $storageAccountName --resource-group $resourceGroupName | ConvertFrom-Json
