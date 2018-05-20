@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aci-hxe-instance
+  labels:
+    name: aci-hxe-instance
+spec:
+  restartPolicy: OnFailure
+  volumes:
+    - name: hxe-config
+      secret:
+        defaultMode: 420
+        secretName: masterpassword
+  imagePullSecrets:
+  - name: docker-secret
+  containers:
+  - name: aci-hxe-instance
+    image: "registry-1.docker.io/store/saplabs/hanaexpress:2.00.030.00.20180403.2"
+    resources:
+      requests:
+        memory: 14G
+        cpu: 4
+      limits:
+        memory: 14G
+        cpu: 4
+    ports:
+      - containerPort: 39013
+        name: port1
+      - containerPort: 39015
+        name: port2
+      - containerPort: 39017
+        name: port2
+      - containerPort: 39041
+        name: port2
+      - containerPort: 59013
+        name: port2
+    args: [ "/bin/bash", "-c", "/run_hana --agree-to-sap-license --dont-check-system --passwords-url file:///hana/hxeconfig/masterPassword.json" ]
+    volumeMounts:
+      - name: hxe-config
+        mountPath: /hana/hxeconfig
+  dnsPolicy: ClusterFirst
+  nodeName: virtual-kubelet-hxe-linux
+  tolerations:
+  - key: azure.com/aci
+    effect: NoSchedule
