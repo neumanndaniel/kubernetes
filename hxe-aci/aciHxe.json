@@ -1,0 +1,205 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerName": {
+            "defaultValue": "",
+            "type": "string"
+        },
+        "containerImage": {
+            "defaultValue": "registry-1.docker.io/store/saplabs/hanaexpress:2.00.030.00.20180403.2",
+            "type": "string"
+        },
+        "imageRegistryLoginServer": {
+            "type": "string",
+            "defaultValue": "registry-1.docker.io"
+        },
+        "imageUsername": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "imagePassword": {
+            "type": "securestring",
+            "defaultValue": ""
+        },
+        "osType": {
+            "defaultValue": "Linux",
+            "allowedValues": [
+                "Linux",
+                "Windows"
+            ],
+            "type": "string"
+        },
+        "numberCores": {
+            "defaultValue": 4,
+            "type": "int",
+            "maxValue": 4
+        },
+        "memory": {
+            "defaultValue": 14,
+            "type": "int",
+            "maxValue": 14
+        },
+        "ipType": {
+            "defaultValue": "Public",
+            "type": "string",
+            "allowedValues": [
+                "Public"
+            ]
+        },
+        "fileShareStorageAccount": {
+            "defaultValue": "",
+            "type": "string"
+        },
+        "fileShareName": {
+            "defaultValue": "hxe-config",
+            "allowedValues": [
+                "hxe-config"
+            ],
+            "type": "string"
+        }
+    },
+    "variables": {
+        "apiVersion": {
+            "aci": "2018-04-01",
+            "storage": "2017-10-01"
+        },
+        "aciConfiguration": {
+            "containerName": "[parameters('containerName')]",
+            "restartPolicy": "OnFailure",
+            "osType": "[parameters('osType')]",
+            "image": "[parameters('containerImage')]",
+            "cpuCores": "[parameters('numberCores')]",
+            "memoryInGb": "[parameters('memory')]"
+        },
+        "networkConfiguration": {
+            "ipType": "[parameters('ipType')]",
+            "dnsNameLabel": "[parameters('containerName')]",
+            "ipProtocol": "TCP"
+        },
+        "privateImageRegistryCredentials": {
+            "server": "[parameters('imageRegistryLoginServer')]",
+            "username": "[parameters('imageUsername')]",
+            "password": "[parameters('imagePassword')]"
+        },
+        "volumeConfiguration": {
+            "volumeName": "hxe-config",
+            "volumeMountPath": "/hana/hxeconfig",
+            "volumeName2": "hxe-data",
+            "volumeMountPath2": "/hana/mounts",
+            "fileShareStorageAccount": "[parameters('fileShareStorageAccount')]",
+            "fileShareName": "[parameters('fileShareName')]",
+            "fileShareReadOnly": true
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion').aci]",
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "name": "[variables('aciConfiguration').containerName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('aciConfiguration').containerName]",
+                        "properties": {
+                            "image": "[variables('aciConfiguration').image]",
+                            "command": [
+                                "/bin/bash",
+                                "-c",
+                                "/run_hana --agree-to-sap-license --dont-check-system --passwords-url file:///hana/hxeconfig/masterPassword.json"
+                            ],
+                            "ports": [
+                                {
+                                    "port": "39013"
+                                },
+                                {
+                                    "port": "39015"
+                                },
+                                {
+                                    "port": "39017"
+                                },
+                                {
+                                    "port": "8090"
+                                },
+                                {
+                                    "port": "39041"
+                                },
+                                {
+                                    "port": "59013"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": "[variables('aciConfiguration').cpuCores]",
+                                    "memoryInGb": "[variables('aciConfiguration').memoryInGb]"
+                                }
+                            },
+                            "volumeMounts": [
+                                {
+                                    "name": "[variables('volumeConfiguration').volumeName]",
+                                    "mountPath": "[variables('volumeConfiguration').volumeMountPath]",
+                                    "readOnly": "[variables('volumeConfiguration').fileShareReadOnly]"
+                                },
+                                {
+                                    "name": "[variables('volumeConfiguration').volumeName2]",
+                                    "mountPath": "[variables('volumeConfiguration').volumeMountPath2]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "imageRegistryCredentials": [
+                    {
+                        "server": "[variables('privateImageRegistryCredentials').server]",
+                        "username": "[variables('privateImageRegistryCredentials').username]",
+                        "password": "[variables('privateImageRegistryCredentials').password]"
+                    }
+                ],
+                "restartPolicy": "[variables('aciConfiguration').restartPolicy]",
+                "osType": "[variables('aciConfiguration').osType]",
+                "ipAddress": {
+                    "type": "[variables('networkConfiguration').ipType]",
+                    "dnsNameLabel": "[variables('networkConfiguration').dnsNameLabel]",
+                    "ports": [
+                        {
+                            "protocol": "[variables('networkConfiguration').ipProtocol]",
+                            "port": 39013
+                        },
+                        {
+                            "protocol": "[variables('networkConfiguration').ipProtocol]",
+                            "port": 39015
+                        },
+                        {
+                            "protocol": "[variables('networkConfiguration').ipProtocol]",
+                            "port": 39017
+                        },
+                        {
+                            "protocol": "[variables('networkConfiguration').ipProtocol]",
+                            "port": 39041
+                        },
+                        {
+                            "protocol": "[variables('networkConfiguration').ipProtocol]",
+                            "port": 59013
+                        }
+                    ]
+                },
+                "volumes": [
+                    {
+                        "name": "[variables('volumeConfiguration').volumeName]",
+                        "azureFile": {
+                            "shareName": "[variables('volumeConfiguration').fileShareName]",
+                            "storageAccountName": "[variables('volumeConfiguration').fileShareStorageAccount]",
+                            "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts/',variables('volumeConfiguration').fileShareStorageAccount),variables('apiVersion').storage).keys[0].value]"
+                        }
+                    },
+                    {
+                        "name": "[variables('volumeConfiguration').volumeName2]",
+                        "emptyDir": {}
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
