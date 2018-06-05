@@ -1,5 +1,10 @@
 FROM arm32v7/ubuntu:16.04
 
+ENV VERSION=1.10.2
+ENV OS=linux
+ENV ARCH=armv6l
+ENV GO_DL=https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         apt-utils
@@ -19,8 +24,15 @@ RUN apt-get update \
         libunwind8 \
         netcat
 
-RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
- && apt-get install -y --no-install-recommends git-lfs \
+RUN wget $GO_DL \
+  && tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz \
+  && rm go$VERSION.$OS-$ARCH.tar.gz
+ENV PATH=/usr/local/go/bin:$PATH
+
+RUN mkdir /root/gocode \
+ && export GOPATH=/root/gocode \
+ && go get github.com/github/git-lfs \
+ && cp gocode/bin/git-lfs /usr/bin \
  && rm -rf /var/lib/apt/lists/*
 
 # Accept the TEE EULA
