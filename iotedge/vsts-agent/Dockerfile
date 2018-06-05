@@ -2,7 +2,12 @@ FROM arm32v7/ubuntu:16.04
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
+        apt-utils
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
         software-properties-common \
+        apt-utils \
  && apt-add-repository ppa:git-core/ppa \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -12,8 +17,9 @@ RUN apt-get update \
         libcurl3 \
         libicu55 \
         libunwind8 \
-        netcat \
- && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
+        netcat
+
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
  && apt-get install -y --no-install-recommends git-lfs \
  && rm -rf /var/lib/apt/lists/*
 
