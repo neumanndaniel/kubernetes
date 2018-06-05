@@ -24,7 +24,9 @@ RUN apt-get update \
         libunwind8 \
         netcat
 
-RUN wget $GO_DL \
+RUN apt-get install -y --no-install-recommends \
+  wget \
+  &&wget $GO_DL \
   && tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz \
   && rm go$VERSION.$OS-$ARCH.tar.gz
 ENV PATH=/usr/local/go/bin:$PATH
