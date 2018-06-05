@@ -31,11 +31,12 @@ RUN apt-get install -y --no-install-recommends \
   && rm go$VERSION.$OS-$ARCH.tar.gz
 ENV PATH=/usr/local/go/bin:$PATH
 
-RUN mkdir /root/gocode \
- && export GOPATH=/root/gocode \
- && go get github.com/github/git-lfs \
- && cp gocode/bin/git-lfs /usr/bin \
- && rm -rf /var/lib/apt/lists/*
+RUN apt install -y --no-install-recommends \
+ gcc
+
+COPY ./install_git_lfs.sh .
+RUN chmod +x install_git_lfs.sh
+RUN ./install_git_lfs.sh
 
 # Accept the TEE EULA
 RUN mkdir -p "/root/.microsoft/Team Foundation/4.0/Configuration/TEE-Mementos" \
