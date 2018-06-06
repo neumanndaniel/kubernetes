@@ -6,8 +6,8 @@ COPY qemu-arm-static /usr/bin/qemu-arm-static
 
 ENV VERSION=1.10.2 \
   OS=linux \
-  ARCH=armv6l \
-  GO_DL=https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz
+  ARCH=armv6l
+ENV GO_DL=https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz
 
 RUN apt-get update \
   && apt-get install -y wget \
