@@ -12,10 +12,12 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql
-        image: microsoft/mssql-server-linux
+        image: microsoft/mssql-server-linux:latest
         ports:
         - containerPort: 1433
         env:
+        - name: MSSQL_PID
+          value: "Developer"
         - name: ACCEPT_EULA
           value: "Y"
         - name: SA_PASSWORD
