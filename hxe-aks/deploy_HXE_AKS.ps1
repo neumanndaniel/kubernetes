@@ -58,7 +58,7 @@ $masterPassword=$null
 $BSTR=$null
 $credential=$null
 
-kubectl create -f ./secrets.yaml
+kubectl apply -f ./secrets.yaml
 
 #Enter Docker account details and create docker registry secret
 $credential=Get-Credential -Title 'Enter Docker account username and password'
@@ -78,4 +78,4 @@ $credential=$null
 #HANA Express Edition deployment
 Invoke-WebRequest https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/hxe-aks/deploy_HXE_AKS.yaml -OutFile ./deploy_HXE_AKS.yaml
 
-kubectl create -f ./deploy_HXE_AKS.yaml
+kubectl apply -f ./deploy_HXE_AKS.yaml
