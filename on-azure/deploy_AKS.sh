@@ -81,7 +81,7 @@ output=$(az group deployment create --resource-group $resourceGroupName --templa
 workspaceId=$(echo $output|jq -r .properties.outputs.workspaceId.value)
 primaryKey=$(echo $output|jq -r .properties.outputs.primaryKey.value)
 
-kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey --namepsace kube-system
+kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey --namespace kube-system
 
 wget $gitHubLogAnalyticsAgentUri --output-document=oms-daemonset.yaml
 
