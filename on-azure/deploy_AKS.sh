@@ -68,8 +68,8 @@ az aks get-credentials --resource-group $resourceGroupName --name $aksClusterNam
 
 #kubectl create secret docker-registry $acrRegistryName --docker-server=$acrUri --docker-email=$dockerEmail --docker-username=$dockerUsername --docker-password=$dockerPassword
 
-#Assigning AKS Service Principal the reader role on ACR
-clientId=$(az aks show --resource-group $resourceGroupName --name $aksClusterName --query "servicePrincipalProfile.clientId" --output tsv)
+#Assigning Microsoft default AKS Service Principal (AzureContainerService) the reader role on ACR
+clientId='7319c514-987d-4e9b-ac3d-d38c4f427f4c'
 acrId=$(az acr show --resource-group $resourceGroupName --name $acrRegistryName --query "id" --output tsv)
 
 az role assignment create --assignee $clientId --role Reader --scope $acrId --verbose --output table
