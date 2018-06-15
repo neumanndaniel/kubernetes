@@ -11,13 +11,9 @@ metadata:
     priority: "15"
     loggingOptions: ""
 spec:
-  imagePullSecrets:
-  - name: docker-secret
   containers:
   - name: go-webapp-arm
-    image: azstcr1.azurecr.io/go-webapp-arm:latest
-    ports:
-      - containerPort: 80
+    image: neumanndaniel/go-webapp-arm
   nodeSelector:
     type: virtual-kubelet
   tolerations:
