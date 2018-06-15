@@ -13,6 +13,8 @@ spec:
   containers:
   - name: tempsensor
     image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+  - name: go-webapp-arm
+    image: azstcr1.azurecr.io/go-webapp-arm:latest
   nodeSelector:
     type: virtual-kubelet
   tolerations:
@@ -49,6 +51,11 @@ data:
           "27017/tcp": [
             {
               "HostPort": "27017"
+            }
+          ],
+          "80/tcp": [
+            {
+              "HostPort": "80"
             }
           ]
         }
