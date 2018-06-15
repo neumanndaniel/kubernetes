@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: go-webapp-arm
+  labels:
+    app: go-webapp-arm
+  annotations:
+    isEdgeDeployment: "true"
+    targetCondition: "tags.building='b43'"
+    priority: "15"
+    loggingOptions: ""
+spec:
+  imagePullSecrets:
+  - name: docker-secret
+  containers:
+  - name: go-webapp-arm
+    image: azstcr1.azurecr.io/go-webapp-arm:latest
+    ports:
+      - containerPort: 80
+  nodeSelector:
+    type: virtual-kubelet
+  tolerations:
+  - key: azure.com/iotedge
+    effect: NoSchedule
+---
