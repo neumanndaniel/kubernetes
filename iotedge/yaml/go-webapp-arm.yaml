@@ -13,15 +13,30 @@ metadata:
 spec:
   containers:
   - name: go-webapp-arm
-    image: neumanndaniel/go-webapp-arm
+    image: azstcr1.azurecr.io/go-webapp-arm:latest
   nodeSelector:
     type: virtual-kubelet
   tolerations:
   - key: azure.com/iotedge
     effect: NoSchedule
 ---
-kind: ConfigMap
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edgehub
+data:
+  desiredProperties: |
+    {
+      "routes": {
+        "route": "FROM /* INTO $upstream"
+      },
+      "storeAndForwardConfiguration": {
+        "timeToLiveSecs": 7200
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
 metadata:
   name: go-webapp-arm
 data:
