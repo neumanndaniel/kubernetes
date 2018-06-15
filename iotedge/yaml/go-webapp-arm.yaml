@@ -24,3 +24,24 @@ spec:
   - key: azure.com/iotedge
     effect: NoSchedule
 ---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: go-webapp-arm
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+  createOptions: |
+    {
+      "HostConfig": {
+        "PortBindings": {
+          "80/tcp": [
+            {
+              "HostPort": "80"
+            }
+          ]
+        }
+      }
+    }
+---
