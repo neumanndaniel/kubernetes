@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tempsensor
+  labels:
+    app: tempsensor
+  annotations:
+    isEdgeDeployment: "true"
+    targetCondition: "tags.building='b43'"
+    priority: "15"
+    loggingOptions: ""
+spec:
+  containers:
+  - name: tempsensor
+    image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+  - name: filterfunction
+    image: azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7
+  nodeSelector:
+    type: virtual-kubelet
+  tolerations:
+  - key: azure.com/iotedge
+    effect: NoSchedule
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edgehub
+data:
+  desiredProperties: |
+    {
+      "routes": {
+        "sensorToFilter":"FROM /messages/modules/tempsensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/filterfunction/inputs/input1\")",
+        "filterToIoTHub":"FROM /messages/modules/filterfunction/outputs/* INTO $upstream"
+      },
+      "storeAndForwardConfiguration": {
+        "timeToLiveSecs": 7200
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempsensor
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filterfunction
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
