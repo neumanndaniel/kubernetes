@@ -6,25 +6,15 @@ metadata:
     app: tempsensor
   annotations:
     isEdgeDeployment: "true"
-    targetCondition: |
-      {
-        "tags":{
-          "location":{
-              "building": "home",
-              "floor": "1"
-          },
-          "roomtype": "home office",
-          "environment": "test"
-        }
-      }
-    priority: "1"
+    targetCondition: "tags.location.building='home'"
+    priority: "15"
     loggingOptions: ""
 spec:
   containers:
   - name: tempsensor
     image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
   - name: asa
-    image: microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview006
+    image: "microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview006"
   - name: go-webapp-arm
     image: azstcr1.azurecr.io/go-webapp-arm:latest
   nodeSelector:
@@ -41,10 +31,11 @@ data:
   desiredProperties: |
     {
       "routes": {
-        "telemetryToCloud": "FROM /messages/modules/tempSensor/* INTO $upstream",
+        "route": "FROM /* INTO $upstream",
+        "telemetryToCloud": "FROM /messages/modules/tempsensor/* INTO $upstream",
         "alertsToCloud": "FROM /messages/modules/asa/* INTO $upstream",
-        "alertsToReset": "FROM /messages/modules/asa/* INTO BrokeredEndpoint(\"/modules/tempSensor/inputs/control\")",
-        "telemetryToAsa": "FROM /messages/modules/tempSensor/* INTO BrokeredEndpoint(\"/modules/asa/inputs/temperature\")"
+        "alertsToReset": "FROM /messages/modules/asa/* INTO BrokeredEndpoint(\"/modules/tempsensor/inputs/control\")",
+        "telemetryToAsa": "FROM /messages/modules/tempsensor/* INTO BrokeredEndpoint(\"/modules/asa/inputs/temperature\")"
       },
       "storeAndForwardConfiguration": {
         "timeToLiveSecs": 7200
