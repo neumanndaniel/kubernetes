@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: tempsensor
+  name: aksiotedge
   labels:
-    app: tempsensor
+    app: aksiotedge
   annotations:
     isEdgeDeployment: "true"
     targetCondition: "tags.building='b43'"
