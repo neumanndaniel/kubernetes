@@ -13,6 +13,9 @@ spec:
   containers:
   - name: go-webapp-arm
     image: azstcr1.azurecr.io/go-webapp-arm:latest
+    resources:
+      limits:
+        memory: 100M
   nodeSelector:
     type: virtual-kubelet
   tolerations:
