@@ -24,8 +24,26 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: edgeagent
+data:
+  createOptions: |
+    {
+      "HostConfig": {
+        "Memory": 62914560
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: edgehub
 data:
+  createOptions: |
+    {
+      "HostConfig": {
+        "Memory": 104857600
+      }
+    }
   desiredProperties: |
     {
       "routes": {
@@ -35,7 +53,7 @@ data:
         "telemetryToAsa": "FROM /messages/modules/tempsensor/* INTO BrokeredEndpoint(\"/modules/aks-iot-edge/inputs/temperature\")"
       },
       "storeAndForwardConfiguration": {
-        "timeToLiveSecs": 7200
+        "timeToLiveSecs": 5
       }
     }
 ---
@@ -53,8 +71,6 @@ data:
         "Memory": 41943040
       }
     }
-  desiredProperties: |
-    {}
 ---
 apiVersion: v1
 kind: ConfigMap
