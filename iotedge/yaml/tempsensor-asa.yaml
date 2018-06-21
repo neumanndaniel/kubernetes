@@ -24,6 +24,35 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: edgeagent
+data:
+  desiredProperties: |
+    {
+      "systemModules": {
+        "edgeAgent": {
+          "settings": {
+            "createOptions": {
+              "HostConfig": {
+                "Memory": 62914560
+              }
+            }
+          }
+        },
+        "edgeHub": {
+          "settings": {
+            "createOptions": {
+              "HostConfig": {
+                "Memory": 104857600
+              }
+            }
+          }
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: edgehub
 data:
   desiredProperties: |
