@@ -7,10 +7,16 @@ metadata:
   annotations:
     isEdgeDeployment: "true"
     targetCondition: |
-      "tags.location.building='home'" |
-      "tags.location.floor='1'" |
-      "tags.roomtype='home office'" |
-      "tags.environment='test'"
+      {
+        "tags":{
+          "location":{
+              "building": "home",
+              "floor": "1"
+          },
+          "roomtype": "home office",
+          "environment": "test"
+        }
+      }
     priority: "1"
     loggingOptions: ""
 spec:
