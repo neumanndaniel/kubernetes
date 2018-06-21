@@ -6,13 +6,19 @@ metadata:
     app: tempsensor
   annotations:
     isEdgeDeployment: "true"
-    targetCondition: "tags.building='b43'"
-    priority: "16"
+    targetCondition: |
+      "tags.location.building='home'" |
+      "tags.location.floor='1'" |
+      "tags.roomtype='home office'" |
+      "tags.environment='test'"
+    priority: "1"
     loggingOptions: ""
 spec:
   containers:
   - name: tempsensor
     image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+  - name: asa
+    image: microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview006
   - name: go-webapp-arm
     image: azstcr1.azurecr.io/go-webapp-arm:latest
   nodeSelector:
@@ -29,7 +35,10 @@ data:
   desiredProperties: |
     {
       "routes": {
-        "route": "FROM /* INTO $upstream"
+        "telemetryToCloud": "FROM /messages/modules/tempSensor/* INTO $upstream",
+        "alertsToCloud": "FROM /messages/modules/asa/* INTO $upstream",
+        "alertsToReset": "FROM /messages/modules/asa/* INTO BrokeredEndpoint(\"/modules/tempSensor/inputs/control\")",
+        "telemetryToAsa": "FROM /messages/modules/tempSensor/* INTO BrokeredEndpoint(\"/modules/asa/inputs/temperature\")"
       },
       "storeAndForwardConfiguration": {
         "timeToLiveSecs": 7200
@@ -42,7 +51,7 @@ metadata:
   name: tempsensor
 data:
   status: running
-  restartPolicy: on-unhealthy
+  restartPolicy: always
   version: "1.0"
   createOptions: |
     {
@@ -55,6 +64,21 @@ data:
           ]
         }
       }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asa
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+  desiredProperties: |
+    {
+      "ASAJobInfo": "https://aksiotedgestorage.blob.core.windows.net/asa-container/EdgeJobs/ac9744c8-91d1-4f90-be65-cf5ad593774e/722733ce-0561-40b7-9ad5-03c3c580e18f/ASAJobInfo.txt?sv=2017-04-17&sr=b&sig=rd1%2B7Qs6Cnlvih1HiagQQMm5rnrb7A3U4FODzWux1Gs%3D&st=2018-06-21T06%3A55%3A30Z&se=2021-06-21T07%3A05%3A30Z&sp=r",
+      "ASAJobResourceId": "/subscriptions/05499249-2bf5-4767-b121-db90943e363e/resourceGroups/aks-iot-edge/providers/Microsoft.StreamAnalytics/streamingjobs/aks-iot-edge",
+      "ASAJobEtag": "a62660a8-8eca-4e1d-979c-b2b02eed62f7"
     }
 ---
 apiVersion: v1
