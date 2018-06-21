@@ -13,14 +13,8 @@ spec:
   containers:
   - name: tempsensor
     image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
-    resources:
-      limits:
-        memory: 40M
   - name: aks-iot-edge
     image: "microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview006"
-    resources:
-      limits:
-        memory: 50M
   nodeSelector:
     type: virtual-kubelet
   tolerations:
@@ -54,7 +48,11 @@ data:
   restartPolicy: always
   version: "1.0"
   createOptions: |
-    {}
+    {
+      "HostConfig": {
+        "Memory": 41943040
+      }
+    }
   desiredProperties: |
     {}
 ---
@@ -67,7 +65,11 @@ data:
   restartPolicy: always
   version: "1.0"
   createOptions: |
-    {}
+    {
+      "HostConfig": {
+        "Memory": 52428800
+      }
+    }
   desiredProperties: |
     {
       "ASAJobInfo": "https://aksiotedgestorage.blob.core.windows.net/asa-container/EdgeJobs/ac9744c8-91d1-4f90-be65-cf5ad593774e/722733ce-0561-40b7-9ad5-03c3c580e18f/ASAJobInfo.txt?sv=2017-04-17&sr=b&sig=rd1%2B7Qs6Cnlvih1HiagQQMm5rnrb7A3U4FODzWux1Gs%3D&st=2018-06-21T06%3A55%3A30Z&se=2021-06-21T07%3A05%3A30Z&sp=r",
