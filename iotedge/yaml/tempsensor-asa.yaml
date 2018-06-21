@@ -13,8 +13,14 @@ spec:
   containers:
   - name: tempsensor
     image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+    resources:
+      limits:
+        memory: 40M
   - name: aks-iot-edge
     image: "microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview006"
+    resources:
+      limits:
+        memory: 50M
   nodeSelector:
     type: virtual-kubelet
   tolerations:
