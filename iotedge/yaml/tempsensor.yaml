@@ -14,7 +14,7 @@ spec:
   - name: tempsensor
     image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
   - name: filterfunction
-    image: azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7
+    image: "azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7"
   nodeSelector:
     type: virtual-kubelet
   tolerations:
@@ -45,6 +45,10 @@ data:
   status: running
   restartPolicy: always
   version: "1.0"
+  createOptions: |
+    {}
+  desiredProperties: |
+    {}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -54,3 +58,17 @@ data:
   status: running
   restartPolicy: always
   version: "1.0"
+  createOptions: |
+    {
+      "HostConfig": {
+        "PortBindings": {
+          "80/tcp": [
+            {
+              "HostPort": "80"
+            }
+          ]
+        }
+      }
+    }
+  desiredProperties: |
+    {}
