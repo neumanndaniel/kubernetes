@@ -1,0 +1,84 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: tempsensor-functions-arm
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      name: tempsensor-functions-arm
+      labels:
+        app: tempsensor-functions-arm
+      annotations:
+        isEdgeDeployment: "true"
+        targetCondition: "tags.location.country='worldwide' AND tags.location.building='mobile' AND tags.environment='test'"
+        priority: "1"
+        loggingOptions: ""
+    spec:
+      containers:
+      - name: tempsensor-functions-arm
+        image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+      - name: filterfunction-arm
+        image: "azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7"
+      nodeSelector:
+        type: virtual-kubelet
+      tolerations:
+      - key: azure.com/iotedge
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edgehub
+data:
+  desiredProperties: |
+    {
+      "routes": {
+        "sensorToFilter":"FROM /messages/modules/tempsensor-functions-arm/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/filterfunction-arm/inputs/input1\")",
+        "filterToIoTHub":"FROM /messages/modules/filterfunction-arm/outputs/* INTO $upstream"
+      },
+      "storeAndForwardConfiguration": {
+        "timeToLiveSecs": 5
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempsensor-functions-arm
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+  createOptions: |
+    {
+      "HostConfig": {
+        "Memory": 52428800
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filterfunction-arm
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+  createOptions: |
+    {
+      "HostConfig": {
+        "PortBindings": {
+          "80/tcp": [
+            {
+              "HostPort": "80"
+            }
+          ]
+        }
+      }
+    }
