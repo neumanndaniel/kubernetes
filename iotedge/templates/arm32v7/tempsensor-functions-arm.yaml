@@ -58,7 +58,7 @@ data:
   createOptions: |
     {
       "HostConfig": {
-        "Memory": 52428800
+        "Memory": 20971520
       }
     }
 ---
@@ -73,6 +73,7 @@ data:
   createOptions: |
     {
       "HostConfig": {
+        "Memory": 31457280
         "PortBindings": {
           "80/tcp": [
             {
