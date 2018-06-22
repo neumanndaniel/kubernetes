@@ -1,0 +1,51 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: go-webapp-arm
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      name: go-webapp-arm
+      labels:
+        app: go-webapp-arm
+      annotations:
+        isEdgeDeployment: "true"
+        targetCondition: "tags.location.country='worldwide' AND tags.location.building='mobile' AND tags.environment='test'"
+        priority: "1"
+        loggingOptions: ""
+    spec:
+      containers:
+      - name: go-webapp-arm
+        image: azstcr1.azurecr.io/go-webapp-arm:latest
+      nodeSelector:
+        type: virtual-kubelet
+      tolerations:
+      - key: azure.com/iotedge
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-webapp-arm
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+  createOptions: |
+    {
+      "HostConfig": {
+        "PortBindings": {
+          "80/tcp": [
+            {
+              "HostPort": "80"
+            }
+          ]
+        }
+      }
+    }
