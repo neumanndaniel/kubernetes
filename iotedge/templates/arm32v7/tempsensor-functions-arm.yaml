@@ -16,7 +16,7 @@ spec:
         app: tempsensor-functions-arm
       annotations:
         isEdgeDeployment: "true"
-        targetCondition: "tags.location.country='worldwide' AND tags.location.building='mobile' AND tags.environment='test'"
+        targetCondition: "tags.location.building='mobile' AND tags.environment='test'"
         priority: "1"
         loggingOptions: ""
     spec:
@@ -58,7 +58,7 @@ data:
   createOptions: |
     {
       "HostConfig": {
-        "Memory": 20971520
+        "Memory": 52428800
       }
     }
 ---
@@ -73,7 +73,6 @@ data:
   createOptions: |
     {
       "HostConfig": {
-        "Memory": 31457280
         "PortBindings": {
           "80/tcp": [
             {
