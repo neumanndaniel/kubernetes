@@ -16,7 +16,7 @@ spec:
         app: tempsensor-asa
       annotations:
         isEdgeDeployment: "true"
-        targetCondition: "tags.location.country='azure' AND tags.location.building='westeurope' AND tags.environment='prod'"
+        targetCondition: "tags.location.building='mobile' AND tags.environment='test'"
         priority: "1"
         loggingOptions: ""
     spec:
