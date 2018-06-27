@@ -16,7 +16,7 @@ spec:
         app: tempsensor
       annotations:
         isEdgeDeployment: "true"
-        targetCondition: "tags.location.country='worldwide' AND tags.location.building='mobile' AND tags.environment='test'"
+        targetCondition: "tags.location.building='mobile' AND tags.environment='test'"
         priority: "1"
         loggingOptions: ""
     spec:
