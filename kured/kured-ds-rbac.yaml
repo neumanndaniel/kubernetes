@@ -4,7 +4,7 @@ metadata:
   name: kured
   namespace: kube-system
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: kured
@@ -31,7 +31,7 @@ spec:
       serviceAccountName: kured
       containers:
         - name: kured
-          image: quay.io/weaveworks/kured:master-b27aaa1
+          image: quay.io/weaveworks/kured:support-k8s-1.10-5731b98
           imagePullPolicy: IfNotPresent
           command:
             - /usr/bin/kured
