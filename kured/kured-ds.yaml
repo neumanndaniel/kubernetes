@@ -8,6 +8,9 @@ spec:
     rollingUpdate:
       maxUnavailable: 1
     type: RollingUpdate
+  selector:
+    matchLabels:
+      name: kured
   template:
     metadata:
       labels:
