@@ -93,7 +93,7 @@ data:
     {}
   desiredProperties: |
     {
-      "ASAJobInfo": "https://aksiotedgestorage.blob.core.windows.net/asa-container/EdgeJobs/ac9744c8-91d1-4f90-be65-cf5ad593774e/722733ce-0561-40b7-9ad5-03c3c580e18f/ASAJobInfo.txt?sv=2017-04-17&sr=b&sig=rd1%2B7Qs6Cnlvih1HiagQQMm5rnrb7A3U4FODzWux1Gs%3D&st=2018-06-21T06%3A55%3A30Z&se=2021-06-21T07%3A05%3A30Z&sp=r",
-      "ASAJobResourceId": "/subscriptions/05499249-2bf5-4767-b121-db90943e363e/resourceGroups/aks-iot-edge/providers/Microsoft.StreamAnalytics/streamingjobs/aks-iot-edge",
-      "ASAJobEtag": "a62660a8-8eca-4e1d-979c-b2b02eed62f7"
+      "ASAJobInfo": "REDACTED",
+      "ASAJobResourceId": "REDACTED",
+      "ASAJobEtag": "REDACTED"
     }
