@@ -37,6 +37,26 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: edgeagent
+data:
+  desiredProperties: |
+    {
+      "runtime": {
+        "settings": {
+          "registryCredentials": {
+            "docker": {
+              "address": "REDACTED",
+              "password": "REDACTED",
+              "username": "REDACTED"
+            }
+          }
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: edgehub
 data:
   desiredProperties: |
