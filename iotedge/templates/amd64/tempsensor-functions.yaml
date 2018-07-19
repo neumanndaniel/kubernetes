@@ -1,13 +1,16 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tempsensor-functions
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: tempsensor-functions
   minReadySeconds: 5
   template:
     metadata:
@@ -22,9 +25,9 @@ spec:
     spec:
       containers:
       - name: tempsensor-functions
-        image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+        image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
       - name: filterfunction
-        image: "azstcr1.azurecr.io/filterfunction:0.0.1-amd64"
+        image: azstcr1.azurecr.io/filterfunction:0.0.1-amd64
       nodeSelector:
         type: virtual-kubelet
       tolerations:
@@ -56,11 +59,7 @@ data:
   restartPolicy: always
   version: "1.0"
   createOptions: |
-    {
-      "HostConfig": {
-        "Memory": 52428800
-      }
-    }
+    {}
 ---
 apiVersion: v1
 kind: ConfigMap
