@@ -1,13 +1,16 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tempsensor-functions-arm
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: tempsensor-functions-arm
   minReadySeconds: 5
   template:
     metadata:
@@ -22,14 +25,43 @@ spec:
     spec:
       containers:
       - name: tempsensor-functions-arm
-        image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+        image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
       - name: filterfunction-arm
-        image: "azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7"
+        image: azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7
       nodeSelector:
         type: virtual-kubelet
       tolerations:
       - key: azure.com/iotedge
         effect: NoSchedule
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edgeagent
+data:
+  desiredProperties: |
+    {
+      "runtime": {
+        "settings": {
+          "registryCredentials": {
+            "docker": {
+              "address": "REDACTED",
+              "password": "REDACTED",
+              "username": "REDACTED"
+            }
+          }
+        }
+      },
+      "systemModules": {
+        "edgeHub": {
+          "env": {
+            "OptimizeForPerformance": {
+              "value": "false"
+            }
+          }
+        }
+      }
+    }
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -56,11 +88,7 @@ data:
   restartPolicy: always
   version: "1.0"
   createOptions: |
-    {
-      "HostConfig": {
-        "Memory": 52428800
-      }
-    }
+    {}
 ---
 apiVersion: v1
 kind: ConfigMap
