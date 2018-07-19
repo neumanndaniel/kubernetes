@@ -1,13 +1,16 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tempsensor
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: tempsensor
   minReadySeconds: 5
   template:
     metadata:
@@ -22,12 +25,30 @@ spec:
     spec:
       containers:
       - name: tempsensor
-        image: "microsoft/azureiotedge-simulated-temperature-sensor:1.0-preview"
+        image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
       nodeSelector:
         type: virtual-kubelet
       tolerations:
       - key: azure.com/iotedge
         effect: NoSchedule
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edgeagent
+data:
+  desiredProperties: |
+    {
+      "systemModules": {
+        "edgeHub": {
+          "env": {
+            "OptimizeForPerformance": {
+              "value": "false"
+            }
+          }
+        }
+      }
+    }
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -53,8 +74,4 @@ data:
   restartPolicy: always
   version: "1.0"
   createOptions: |
-    {
-      "HostConfig": {
-        "Memory": 52428800
-      }
-    }
+    {}
