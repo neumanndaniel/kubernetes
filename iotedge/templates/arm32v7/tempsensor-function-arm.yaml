@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tempsensor-functions-arm
+  name: tempsensor-function-arm
 spec:
   replicas: 2
   strategy:
@@ -10,24 +10,24 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: tempsensor-functions-arm
+      app: tempsensor-function-arm
   minReadySeconds: 5
   template:
     metadata:
-      name: tempsensor-functions-arm
+      name: tempsensor-function-arm
       labels:
-        app: tempsensor-functions-arm
+        app: tempsensor-function-arm
       annotations:
         isEdgeDeployment: "true"
         targetCondition: "tags.location.building='mobile' AND tags.environment='test'"
-        priority: "1"
+        priority: "15"
         loggingOptions: ""
     spec:
       containers:
-      - name: tempsensor-functions-arm
+      - name: tempsensor
         image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
-      - name: filterfunction-arm
-        image: azstcr1.azurecr.io/filterfunction:0.0.1-arm32v7
+      - name: function
+        image: REDACTED.azurecr.io/filterfunction:0.0.1-arm32v7
       nodeSelector:
         type: virtual-kubelet
       tolerations:
@@ -71,18 +71,18 @@ data:
   desiredProperties: |
     {
       "routes": {
-        "sensorToFilter":"FROM /messages/modules/tempsensor-functions-arm/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/filterfunction-arm/inputs/input1\")",
-        "filterToIoTHub":"FROM /messages/modules/filterfunction-arm/outputs/* INTO $upstream"
+        "sensorToFilter":"FROM /messages/modules/tempsensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/function/inputs/input1\")",
+        "filterToIoTHub":"FROM /messages/modules/function/outputs/* INTO $upstream"
       },
       "storeAndForwardConfiguration": {
-        "timeToLiveSecs": 5
+        "timeToLiveSecs": 7200
       }
     }
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tempsensor-functions-arm
+  name: tempsensor
 data:
   status: running
   restartPolicy: always
@@ -93,7 +93,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: filterfunction-arm
+  name: function
 data:
   status: running
   restartPolicy: always
