@@ -20,14 +20,14 @@ spec:
       annotations:
         isEdgeDeployment: "true"
         targetCondition: "tags.location.building='azure' AND tags.environment='prod'"
-        priority: "1"
+        priority: "15"
         loggingOptions: ""
     spec:
       containers:
-      - name: tempsensor-ml
+      - name: tempsensor
         image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
-      - name: machinelearningmodule
-        image: azstcr1.azurecr.io/machinelearningmodule:2
+      - name: machinelearning
+        image: REDACTED.azurecr.io/machinelearningmodule:1
       nodeSelector:
         type: virtual-kubelet
       tolerations:
@@ -62,18 +62,18 @@ data:
   desiredProperties: |
     {
       "routes": {
-        "sensorToMachineLearning":"FROM /messages/modules/tempsensor-ml/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/machinelearningmodule/inputs/amlInput\")",
-        "machineLearningToIoTHub": "FROM /messages/modules/machinelearningmodule/outputs/amlOutput INTO $upstream"
+        "sensorToMachineLearning":"FROM /messages/modules/tempsensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/machinelearning/inputs/amlInput\")",
+        "machineLearningToIoTHub": "FROM /messages/modules/machinelearning/outputs/amlOutput INTO $upstream"
       },
       "storeAndForwardConfiguration": {
-        "timeToLiveSecs": 5
+        "timeToLiveSecs": 7200
       }
     }
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tempsensor-ml
+  name: tempsensor
 data:
   status: running
   restartPolicy: always
@@ -84,7 +84,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: machinelearningmodule
+  name: machinelearning
 data:
   status: running
   restartPolicy: always
