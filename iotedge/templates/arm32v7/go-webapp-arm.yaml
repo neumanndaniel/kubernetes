@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: go-webapp-arm
-        image: azstcr1.azurecr.io/go-webapp-arm:latest
+        image: REDACTED.azurecr.io/go-webapp-arm:latest
       nodeSelector:
         type: virtual-kubelet
       tolerations:
@@ -71,7 +71,7 @@ data:
         "route": "FROM /* INTO $upstream",
       },
       "storeAndForwardConfiguration": {
-        "timeToLiveSecs": 5
+        "timeToLiveSecs": 7200
       }
     }
 ---
