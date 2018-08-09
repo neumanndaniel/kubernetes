@@ -13,6 +13,14 @@ echo '(1) West Europe
 (3) Central US
 (4) Canada Central
 (5) Canada East
+(6) Australia East
+(7) East US2
+(8) Japan East
+(9) North Europe
+(10) Southeast Asia
+(11) UK South
+(12) West US
+(13) West US2
 Enter Azure region for AKS deployment:'
 
 read inputKey
@@ -33,6 +41,30 @@ case $inputKey in
     5)
         azureRegion='canadaeast'
         ;;
+    6)
+        azureRegion='australiaeast'
+        ;;
+    7)
+        azureRegion='eastus2'
+        ;;
+    8)
+        azureRegion='japaneast'
+        ;;
+    9)
+        azureRegion='northeurope'
+        ;;
+    10)
+        azureRegion='southeastasia'
+        ;;
+    11)
+        azureRegion='uksouth'
+        ;;
+    12)
+        azureRegion='westus'
+        ;;
+    13)
+        azureRegion='westus2'
+        ;;
 esac
 
 #Create resource group
@@ -52,11 +84,11 @@ echo '>>Getting AKS cluster credentials:'
 az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName
 
 #Deploy AKS ACI connector for Linux
-#echo '>>Deploying ACI connector for Linux to AKS cluster:'
-#helm init
-#echo '>>Waiting 30 seconds to spin up tiller pod:'
-#sleep 30
-#az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
+echo '>>Deploying ACI connector for Linux to AKS cluster:'
+helm init
+echo '>>Waiting 30 seconds to spin up tiller pod:'
+sleep 30
+az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName
 
 #Getting ACR container registry credentials and login
 #echo '>>Getting ACR container registry credentials and create Kubernetes secret for ACR:'
