@@ -42,7 +42,7 @@ Import-AzureRmAutomationRunbook -Path ./secretProvisioning.ps1 -ResourceGroupNam
 
 #Create Azure DevTest Lab
 Write-Output '>>Creating Azure DevTest Lab:'
-$output = az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters labName=$name --verbose|ConvertFrom-Json
+az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters labName=$name --verbose
 
 #Set access on default DevTest Lab Key Vault for the Azure Automation run as account and current user context
 Write-Output '>>Setting ACL on DTL Key Vault for Azure Automation run as account:'
@@ -67,7 +67,7 @@ $kubernetesServicePrincipal = $null
 
 #Depoy Logic App workflow
 Write-Output '>>Creating Logic App workflow:'
-$output = az group deployment create --resource-group $resourceGroupName --template-uri $gitHubLogicAppWorkflowUri --parameters resourceGroupName=$resourceGroupName automationAccountName=$name --verbose|ConvertFrom-Json
+az group deployment create --resource-group $resourceGroupName --template-uri $gitHubLogicAppWorkflowUri --parameters resourceGroupName=$resourceGroupName automationAccountName=$name --verbose
 
 #Import necessary Azure PowerShell module AzureRm.keyvault
 Write-Output '>>Importing the Azure PowerShell module AzureRm.keyvault'
