@@ -3,6 +3,8 @@ $region = 'northeurope'
 $azureAutomationregion = 'northeurope'
 $resourceGroupName = 'dtlSession'
 $name = 'dtlSession'
+$customRbacRoleName="dtlAksCredentials"
+$customRbacRoleId='{USE THE CUSTOMROLEDEPLOYMENT.PS1 SCRIPT TO GET THE ROLE ID}'
 $connectionName = 'AzureRunAsConnection'
 $aadServicePrincipalIdName = 'kubernetesId'
 $aadServicePrincipalSecretName = 'kubernetesSecret'
@@ -59,10 +61,11 @@ az keyvault set-policy --name $defaultVaultName --upn $currentUser --secret-perm
 Write-Output '>>Creating Kubernetes service principal account:'
 $kubernetesServicePrincipal = az ad sp create-for-rbac --skip-assignment --verbose
 
-#Save Kubernetes service principal id and secret to default DevTest Lab Key Vault
+#Save Kubernetes service principal id, secret and custom RBAC role id to default DevTest Lab Key Vault
 Write-Output '>>Saving Kubernetes service principal id and secret in DTL Key Vault:'
 $null = az keyvault secret set --vault-name $defaultVaultName --name $aadServicePrincipalSecretName --value ($kubernetesServicePrincipal|ConvertFrom-Json).password --verbose
 $null = az keyvault secret set --vault-name $defaultVaultName --name $aadServicePrincipalIdName --value ($kubernetesServicePrincipal|ConvertFrom-Json).appId --verbose
+$null = az keyvault secret set --vault-name $defaultVaultName --name $customRbacRoleName --value $customRbacRoleId --verbose
 $kubernetesServicePrincipal = $null
 
 #Depoy Logic App workflow
