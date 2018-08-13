@@ -9,6 +9,7 @@ Param
 $connectionName = "AzureRunAsConnection"
 $aadServicePrincipalIdName = "kubernetesId"
 $aadServicePrincipalSecretName = "kubernetesSecret"
+$customRbacRoleName="dtlAksCredentials"
 $targetKeyVaultName = $keyVaultName.Split("/")
 $targetKeyVaultName = $targetKeyVaultName[$targetKeyVaultName.Length - 1]
 $resourceGroupName = $keyVaultName.Split("/")
@@ -75,12 +76,14 @@ catch {
     Write-Output $_
 }
 
-#Read Kubernetes service principal id and secret from source Key Vault and write to target Key Vault
+#Read Kubernetes service principal id, secret and custom RBAC role id from source Key Vault and write to target Key Vault
 try {
     $aadServicePrincipalId = Get-AzureKeyVaultSecret -VaultName $sourceKeyVaultName -Name $aadServicePrincipalIdName
     $aadServicePrincipalSecret = Get-AzureKeyVaultSecret -VaultName $sourceKeyVaultName -Name $aadServicePrincipalSecretName
+    $customRbacRole = Get-AzureKeyVaultSecret -VaultName $sourceKeyVaultName -Name $customRbacRoleName
     $null=Set-AzureKeyVaultSecret -VaultName $targetKeyVaultName -Name $aadServicePrincipalIdName -SecretValue $aadServicePrincipalId.SecretValue
     $null=Set-AzureKeyVaultSecret -VaultName $targetKeyVaultName -Name $aadServicePrincipalSecretName -SecretValue $aadServicePrincipalSecret.SecretValue
+    $null=Set-AzureKeyVaultSecret -VaultName $targetKeyVaultName -Name $customRbacRoleName -SecretValue $customRbacRole.SecretValue
 }
 catch {
     Write-Output 'ERROR:'
