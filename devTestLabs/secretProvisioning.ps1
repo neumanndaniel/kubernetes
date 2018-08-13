@@ -38,18 +38,6 @@ catch {
     }
 }
 
-#Identifying target Key Vault of the Azure DevTest Lab
-try {
-    $temp=$targetKeyVaultName -replace "devtestlab",""
-    if($temp.length -ne 4) {
-        exit
-    }
-}
-catch {
-    Write-Output 'ERROR:'
-    Write-Output $_
-}
-
 #Identifying source Key Vault of the Azure DevTest Lab
 try {
     $keyVaults = (Get-AzureRmKeyVault -ResourceGroupName $resourceGroupName).VaultName
@@ -58,6 +46,9 @@ try {
         $temp=$item -replace "[a-z]"
         if($temp.length -eq 4) {
             $sourceKeyVaultName = $item
+            if($sourceKeyVaultName -eq $targetKeyVaultName) {
+                exit
+            }
         }
     }
 }
