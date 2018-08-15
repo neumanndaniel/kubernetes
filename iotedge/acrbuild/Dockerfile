@@ -1,6 +1,6 @@
 FROM arm32v7/ubuntu:18.04
 
-LABEL Daniel Neumann <https://www.danielstechblog.io>
+LABEL maintainer="Daniel Neumann <https://www.danielstechblog.io>"
 
 WORKDIR /webapp
 ADD /go-webapp .
