@@ -6,6 +6,6 @@ WORKDIR /webapp
 ADD /go-webapp .
 RUN chmod +x ./webapp
 
-ENTRYPOINT ./webapp
+EXPOSE 8080
 
-EXPOSE 80
+ENTRYPOINT ./webapp
