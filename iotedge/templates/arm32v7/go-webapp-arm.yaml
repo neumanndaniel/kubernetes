@@ -87,7 +87,7 @@ data:
     {
       "HostConfig": {
         "PortBindings": {
-          "80/tcp": [
+          "8080/tcp": [
             {
               "HostPort": "80"
             }
