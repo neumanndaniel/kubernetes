@@ -8,6 +8,7 @@ COPY qemu-arm-static /usr/bin/qemu-arm-static
 
 WORKDIR /webapp
 ADD --chown=container:container /go-webapp .
+RUN chmod +x ./webapp
 
 USER container
 
