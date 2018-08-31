@@ -10,10 +10,7 @@ $gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates
 
 $inputKey=Read-Host '(1) West Europe
 (2) East US
-(3) Canada Central
-(4) Japan East
-(5) Southeast Asia
-(6) UK South
+(3) Southeast Asia
 Enter Azure region for AKS deployment'
 
 switch ($inputKey.ToUpper()) {
@@ -24,16 +21,7 @@ switch ($inputKey.ToUpper()) {
         $azureRegion='eastus'
     }
     3 {
-        $azureRegion='canadacentral'
-    }
-    4 {
-        $azureRegion='japaneast'
-    }
-    5 {
         $azureRegion='southeastasia'
-    }
-    6 {
-        $azureRegion='uksouth'
     }
 }
 
@@ -78,13 +66,13 @@ az role assignment create --assignee $clientId --role Reader --scope $acrId --ve
 
 #Create Log Analytics workspace, add the container monitoring solution to the workspace and deploy Log Analytics agent on the AKS cluster
 Write-Output '>>Creating Log Analytics workspace and deploy OMS agent to AKS cluster:'
-$output=az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose|ConvertFrom-Json
+$null=az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose|ConvertFrom-Json
 
-$workspaceId=$output.properties.outputs.workspaceId.value
+#$workspaceId=$output.properties.outputs.workspaceId.value
 #$primaryKey=$output.properties.outputs.primaryKey.value
+$workspaceResourceId=az resource show --resource-group $resourceGroupName --name $omsWorkspaceName --resource-type 'Microsoft.OperationalInsights/workspaces' --verbose|ConvertFrom-Json
 
-az aks enable-addons --addons monitoring --resource-group $resourceGroupName --name $aksClusterName --workspace-resource-id $workspaceId --output table
-
+az aks enable-addons --addons monitoring --resource-group $resourceGroupName --name $aksClusterName --workspace-resource-id $workspaceResourceId.id --output table
 
 #kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey --namespace kube-system
 
