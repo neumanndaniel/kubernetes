@@ -1,7 +1,7 @@
 #Variables for AKS deployment
 $resourceGroupName='aks-demo-rg'
 $aksClusterName='aks-demo-cluster'
-$aksAciConnectorName='aciconnector'
+#$aksAciConnectorName='aciconnector'
 $acrRegistryName='aksdemoacr'
 $omsWorkspaceName='aks-demo-oms'
 $gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/operationsmanagement/aksMonitoringSolution.json'
@@ -49,11 +49,11 @@ Write-Output '>>Getting AKS cluster credentials:'
 az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName --admin
 
 #Deploy AKS ACI connector for Linux
-Write-Output '>>Deploying ACI connector for Linux to AKS cluster:'
-helm init
-Write-Output '>>Waiting 30 seconds to spin up tiller pod:'
-Start-Sleep -Seconds 30
-az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName --service-principal ($kubernetesServicePrincipal|ConvertFrom-Json).appId --client-secret ($kubernetesServicePrincipal|ConvertFrom-Json).password
+#Write-Output '>>Deploying ACI connector for Linux to AKS cluster:'
+#helm init
+#Write-Output '>>Waiting 30 seconds to spin up tiller pod:'
+#Start-Sleep -Seconds 30
+#az aks install-connector --resource-group $resourceGroupName --name $aksClusterName --connector-name $aksAciConnectorName --service-principal ($kubernetesServicePrincipal|ConvertFrom-Json).appId --client-secret ($kubernetesServicePrincipal|ConvertFrom-Json).password
 
 $kubernetesServicePrincipal = $null
 
