@@ -5,22 +5,15 @@ $aksAciConnectorName='aciconnector'
 $acrRegistryName='aksdemoacr'
 $omsWorkspaceName='aks-demo-oms'
 $gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/operationsmanagement/aksMonitoringSolution.json'
-$gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/omsagent/oms-daemonset.yaml'
-$dockerEmail='AKS@AzureRM'
+#$gitHubLogAnalyticsAgentUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/omsagent/oms-daemonset.yaml'
+#$dockerEmail='AKS@AzureRM'
 
 $inputKey=Read-Host '(1) West Europe
 (2) East US
-(3) Central US
-(4) Canada Central
-(5) Canada East
-(6) Australia East
-(7) East US2
-(8) Japan East
-(9) North Europe
-(10) Southeast Asia
-(11) UK South
-(12) West US
-(13) West US2
+(3) Canada Central
+(4) Japan East
+(5) Southeast Asia
+(6) UK South
 Enter Azure region for AKS deployment'
 
 switch ($inputKey.ToUpper()) {
@@ -31,37 +24,16 @@ switch ($inputKey.ToUpper()) {
         $azureRegion='eastus'
     }
     3 {
-        $azureRegion='centralus'
-    }
-    4 {
         $azureRegion='canadacentral'
     }
-    5 {
-        $azureRegion='canadaeast'
-    }
-    6 {
-        $azureRegion='australiaeast'
-    }
-    7 {
-        $azureRegion='eastus2'
-    }
-    8 {
+    4 {
         $azureRegion='japaneast'
     }
-    9 {
-        $azureRegion='northeurope'
-    }
-    10 {
+    5 {
         $azureRegion='southeastasia'
     }
-    11 {
+    6 {
         $azureRegion='uksouth'
-    }
-    12 {
-        $azureRegion='westus'
-    }
-    13 {
-        $azureRegion='westus2'
     }
 }
 
@@ -75,11 +47,11 @@ az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku 
 
 #Create AKS cluster
 Write-Output '>>Creating AKS cluster:'
-az aks create --resource-group $resourceGroupName --name $aksClusterName --node-count 1 --node-vm-size Standard_A2_v2 --generate-ssh-keys --output table
+az aks create --resource-group $resourceGroupName --name $aksClusterName --node-count 1 --node-vm-size Standard_D2s_v3 --generate-ssh-keys --disable-rbac --output table
 
 #Getting AKS cluster credentials
 Write-Output '>>Getting AKS cluster credentials:'
-az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName
+az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName --admin
 
 #Deploy AKS ACI connector for Linux
 Write-Output '>>Deploying ACI connector for Linux to AKS cluster:'
@@ -109,10 +81,13 @@ Write-Output '>>Creating Log Analytics workspace and deploy OMS agent to AKS clu
 $output=az group deployment create --resource-group $resourceGroupName --template-uri $gitHubTemplateUri --parameters workspaceName=$omsWorkspaceName --verbose|ConvertFrom-Json
 
 $workspaceId=$output.properties.outputs.workspaceId.value
-$primaryKey=$output.properties.outputs.primaryKey.value
+#$primaryKey=$output.properties.outputs.primaryKey.value
 
-kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey --namespace kube-system
+az aks enable-addons --addons monitoring --resource-group $resourceGroupName --name $aksClusterName --workspace-resource-id $workspaceId --output table
 
-Invoke-WebRequest $gitHubLogAnalyticsAgentUri -OutFile ./oms-daemonset.yaml
 
-kubectl apply -f ./oms-daemonset.yaml
+#kubectl create secret generic omsagent-secret --from-literal=WSID=$workspaceId --from-literal=KEY=$primaryKey --namespace kube-system
+
+#Invoke-WebRequest $gitHubLogAnalyticsAgentUri -OutFile ./oms-daemonset.yaml
+
+#kubectl apply -f ./oms-daemonset.yaml
