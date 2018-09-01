@@ -27,7 +27,7 @@ esac
 
 #Create Kubernetes service principal account
 echo '>>Creating Kubernetes service principal account:'
-kubernetesServicePrincipal = az ad sp create-for-rbac --skip-assignment --verbose
+kubernetesServicePrincipal=$(az ad sp create-for-rbac --skip-assignment --verbose)
 
 #Create resource group
 echo '>>Creating resource group:'
@@ -40,7 +40,7 @@ az acr create --resource-group $resourceGroupName --name $acrRegistryName --sku 
 #Assigning AKS Service Principal the reader role on ACR
 acrId=$(az acr show --resource-group $resourceGroupName --name $acrRegistryName --query "id" --output tsv)
 
-az role assignment create --assignee $(echo $kubernetesServicePrincipal|jq - .appId) --role Reader --scope $acrId --verbose --output table
+az role assignment create --assignee $(echo $kubernetesServicePrincipal|jq -r .appId) --role Reader --scope $acrId --verbose --output table
 
 #Create AKS cluster
 echo '>>Creating AKS cluster:'
