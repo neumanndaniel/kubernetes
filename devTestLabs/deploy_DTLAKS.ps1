@@ -3,8 +3,6 @@ $region = 'northeurope'
 $azureAutomationregion = 'northeurope'
 $resourceGroupName = 'dtlSession'
 $name = 'dtlSession'
-$customRbacRoleName="dtlAksCredentials"
-$customRbacRoleId='{USE THE CUSTOMROLEDEPLOYMENT.PS1 SCRIPT TO GET THE ROLE ID}'
 $connectionName = 'AzureRunAsConnection'
 $aadServicePrincipalIdName = 'kubernetesId'
 $aadServicePrincipalSecretName = 'kubernetesSecret'
@@ -28,7 +26,7 @@ Do {
     Start-Sleep 30
     Write-Output '>>Checking if Automation run as account has been created...'
     $automationAccount = Get-AzureRmAutomationConnection -Name $connectionName -ResourceGroupName $resourceGroupName -AutomationAccountName $name -ErrorAction SilentlyContinue
-}While ($automationAccount -eq $null)
+}While ($null -eq $automationAccount)
 
 Write-Output '>>Automation run as account has been successfully created!'
 
@@ -65,7 +63,6 @@ $kubernetesServicePrincipal = az ad sp create-for-rbac --skip-assignment --verbo
 Write-Output '>>Saving Kubernetes service principal id and secret in DTL Key Vault:'
 $null = az keyvault secret set --vault-name $defaultVaultName --name $aadServicePrincipalSecretName --value ($kubernetesServicePrincipal|ConvertFrom-Json).password --verbose
 $null = az keyvault secret set --vault-name $defaultVaultName --name $aadServicePrincipalIdName --value ($kubernetesServicePrincipal|ConvertFrom-Json).appId --verbose
-$null = az keyvault secret set --vault-name $defaultVaultName --name $customRbacRoleName --value $customRbacRoleId --verbose
 $kubernetesServicePrincipal = $null
 
 #Depoy Logic App workflow
