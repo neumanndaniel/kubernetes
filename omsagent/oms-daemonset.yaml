@@ -8,11 +8,17 @@ spec:
     rollingUpdate:
       maxUnavailable: 1
     type: RollingUpdate
+  selector:
+    matchLabels:
+      app: omsagent
   template:
    metadata:
     labels:
      app: omsagent
+     agentVersion: 1.6.0-163
+     dockerProviderVersion: 1.0.0-34
    spec:
+    serviceAccount: omsagent
     containers:
       - name: omsagent
         image: "microsoft/oms"
@@ -24,6 +30,13 @@ spec:
           protocol: TCP
         - containerPort: 25224
           protocol: UDP
+        resources:
+          limits:
+            cpu: 150m
+            memory: 750Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
         volumeMounts:
          - mountPath: /var/run/docker.sock
            name: docker-sock
