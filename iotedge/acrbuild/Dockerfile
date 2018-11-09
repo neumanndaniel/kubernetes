@@ -1,8 +1,9 @@
-FROM arm32v7/ubuntu:18.04
+FROM armhf/alpine
 
 LABEL maintainer="Daniel Neumann <https://www.danielstechblog.io>"
-RUN groupadd -r -g 127001 container && \
-    useradd -r -u 127001 -g container container
+
+RUN addgroup -S -g 127001 container && \
+    adduser -SD -u 127001 -G container container
 
 WORKDIR /webapp
 ADD --chown=container:container /go-webapp .
