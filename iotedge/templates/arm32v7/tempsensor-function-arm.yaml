@@ -6,8 +6,8 @@ spec:
   replicas: 2
   strategy:
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+      maxSurge: 0
+      maxUnavailable: 100%
   selector:
     matchLabels:
       app: tempsensor-function-arm
@@ -31,7 +31,9 @@ spec:
       nodeSelector:
         type: virtual-kubelet
       tolerations:
-      - key: azure.com/iotedge
+      - key: virtual-kubelet.io/provider
+        operator: Equal
+        value: iotedge
         effect: NoSchedule
 ---
 apiVersion: v1
