@@ -6,8 +6,8 @@ spec:
   replicas: 2
   strategy:
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+      maxSurge: 0
+      maxUnavailable: 100%
   selector:
     matchLabels:
       app: tempsensor-asa
@@ -26,11 +26,13 @@ spec:
       - name: tempsensor
         image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
       - name: streamanalytics
-        image: microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview007
+        image: microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview012
       nodeSelector:
         type: virtual-kubelet
       tolerations:
-      - key: azure.com/iotedge
+      - key: virtual-kubelet.io/provider
+        operator: Equal
+        value: iotedge
         effect: NoSchedule
 ---
 apiVersion: v1
