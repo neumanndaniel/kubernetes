@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-src-ip
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: src-ip-internal
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - port: 8080
+    from:
+      - podSelector:
+          matchLabels:
+            app: busybox
