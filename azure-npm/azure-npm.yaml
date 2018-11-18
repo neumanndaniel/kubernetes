@@ -4,7 +4,7 @@ metadata:
   name: azure-npm
   namespace: kube-system
   labels:
-    addonmanager.kubernetes.io/mode: "EnsureExists"
+    addonmanager.kubernetes.io/mode: EnsureExists
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -12,7 +12,7 @@ metadata:
   name: azure-npm
   namespace: kube-system
   labels:
-    addonmanager.kubernetes.io/mode: "EnsureExists"
+    addonmanager.kubernetes.io/mode: EnsureExists
 rules:
   - apiGroups:
     - ""
@@ -25,7 +25,7 @@ rules:
       - list
       - watch
   - apiGroups:
-    - "networking.k8s.io"
+    - networking.k8s.io
     resources:
       - networkpolicies
     verbs:
@@ -39,7 +39,7 @@ metadata:
   name: azure-npm-binding
   namespace: kube-system
   labels:
-    addonmanager.kubernetes.io/mode: "EnsureExists"
+    addonmanager.kubernetes.io/mode: EnsureExists
 subjects:
   - kind: ServiceAccount
     name: azure-npm
@@ -56,15 +56,11 @@ metadata:
   namespace: kube-system
   labels:
     app: azure-npm
-    addonmanager.kubernetes.io/mode: "EnsureExists"
+    addonmanager.kubernetes.io/mode: EnsureExists
 spec:
   selector:
     matchLabels:
       k8s-app: azure-npm
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 1
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -75,9 +71,11 @@ spec:
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
+      nodeSelector:
+        beta.kubernetes.io/os: linux
       containers:
         - name: azure-npm
-          image: containernetworking/azure-npm:v1.0.9
+          image: containernetworking/azure-npm:v1.0.13
           securityContext:
             privileged: true
           env:
@@ -91,7 +89,6 @@ spec:
             mountPath: /run/xtables.lock
           - name: log
             mountPath: /var/log
-      priorityClassName: azure-npm-priority-class
       hostNetwork: true
       volumes:
       - name: log
