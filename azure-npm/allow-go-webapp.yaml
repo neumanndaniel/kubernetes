@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-go-webapp
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: go-webapp
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - port: 8080
+    from: []
