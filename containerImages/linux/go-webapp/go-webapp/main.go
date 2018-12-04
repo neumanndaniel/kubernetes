@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -17,5 +18,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", handler)
+	log.Info("Serving on port :8080")
 	http.ListenAndServe(":8080", nil)
 }
