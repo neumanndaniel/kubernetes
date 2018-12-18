@@ -26,7 +26,8 @@ spec:
       - name: tempsensor
         image: mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0
       - name: streamanalytics
-        image: microsoft/azureiotedge-azure-stream-analytics:1.0.0-preview012
+        image: mcr.microsoft.com/azure-stream-analytics/azureiotedge:1.0.0
+      terminationGracePeriodSeconds: 0
       nodeSelector:
         type: virtual-kubelet
       tolerations:
@@ -90,10 +91,15 @@ data:
   restartPolicy: always
   version: "1.0"
   createOptions: |
-    {}
+    {
+      "Env": [
+               "PlanId=REDACTED"
+      ]
+    }
   desiredProperties: |
     {
       "ASAJobInfo": "REDACTED",
       "ASAJobResourceId": "REDACTED",
-      "ASAJobEtag": "REDACTED"
+      "ASAJobEtag": "REDACTED",
+      "PublishTimestamp": "12/11/2018 9:00:57 AM"
     }
