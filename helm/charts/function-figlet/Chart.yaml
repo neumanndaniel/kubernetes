@@ -1,0 +1,3 @@
+name: function-figlet
+version: 0.0.1
+description: A Helm chart to deploy an Azure Function - HTTP trigger - Hello World

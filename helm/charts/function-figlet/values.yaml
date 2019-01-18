@@ -1,0 +1,26 @@
+general:
+  namespace: default
+image:
+  repository: neumanndaniel/figlet
+  tag: 1.0.0
+  pullPolicy: Always
+container:
+  name: function-figlet
+  port: 80
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 50m
+    memory: 128Mi
+hpa:
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+    cpu:
+      targetAverageUtilization: 10
+service:
+  type: LoadBalancer
+  ports:
+    port: 80
+    targetPort: 80

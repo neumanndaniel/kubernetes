@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "function-figlet.fullname" . }}
+  namespace: {{ .Values.general.namespace }}
+  labels:
+    app: {{ template "function-figlet.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.ports.port }}
+    targetPort: {{ .Values.service.ports.targetPort }}
+  selector:
+    app: {{ template "function-figlet.name" . }}
+    release: {{ .Release.Name }}

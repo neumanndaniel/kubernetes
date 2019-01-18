@@ -1,0 +1,5 @@
+The Azure Function - HTTP trigger - Hello World is getting deployed on your cluster.
+
+To verify that the Azure Function - HTTP trigger - Hello World has started, run:
+
+  kubectl --namespace={{ .Release.Namespace }} get pods -l "app={{ template "function-figlet.name" . }}" -l "release={{ .Release.Name }}"
