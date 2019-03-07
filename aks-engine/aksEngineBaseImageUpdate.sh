@@ -18,7 +18,7 @@ else
 fi
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Logging in to Azure via Managed Service Identity..."
-NULL=az login --identity
+NULL=$(az login --identity)
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Gathering information about the Kubernetes cluster and the latest base image..."
 VMSS=$(kubectl get nodes|grep vmss --max-count=1|cut -d ' ' -f1|rev|cut -c 7-|rev)
@@ -35,9 +35,9 @@ BASEIMAGESCOUNT=$(echo $BASEIMAGES|jq length)
 LATESTBASEIMAGE=$(echo $BASEIMAGES| jq .[$BASEIMAGECOUNT-1])
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating base image..."
-#az vmss update --resource-group $RESOURCEGROUP --name $VMSS \
-#    --set virtualMachineProfile.storageProfile.imageReference.sku=$(echo $LATESTBASEIMAGE|jq .sku|cut -d '"' -f 2) \
-#        virtualMachineProfile.storageProfile.imageReference.version=$(echo $LATESTBASEIMAGE|jq .version|cut -d '"' -f 2)
+az vmss update --resource-group $RESOURCEGROUP --name $VMSS \
+    --set virtualMachineProfile.storageProfile.imageReference.sku=$(echo $LATESTBASEIMAGE|jq .sku|cut -d '"' -f 2) \
+        virtualMachineProfile.storageProfile.imageReference.version=$(echo $LATESTBASEIMAGE|jq .version|cut -d '"' -f 2)
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating VMSS instances..."
 VMSSINSTANCES=$(kubectl get nodes|grep vmss |cut -d ' ' -f1)
@@ -45,11 +45,11 @@ VMSSINSTANCES=$(kubectl get nodes|grep vmss |cut -d ' ' -f1)
 for ITEM in $VMSSINSTANCES; do
     INSTANCEID=$(echo $ITEM|cut -c $(echo ${#ITEM}))
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Draining node $ITEM..."
-    #kubectl drain $ITEM --ignore-daemonsets --delete-local-data --force
+    kubectl drain $ITEM --ignore-daemonsets --delete-local-data --force
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating VMSS instance $ITEM..."
-    #az vmss update-instances --instance-ids $INSTANCEID --name $VMSS --resource-group $RESOURCEGROUP
+    az vmss update-instances --instance-ids $INSTANCEID --name $VMSS --resource-group $RESOURCEGROUP
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Uncordon node $ITEM..."
-    #kubectl uncordon $ITEM
+    kubectl uncordon $ITEM
 done
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Base image update finished..."
