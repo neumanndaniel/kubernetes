@@ -37,13 +37,14 @@ LATESTBASEIMAGE=$(echo $BASEIMAGES| jq .[$BASEIMAGECOUNT-1])
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating base image..."
 az vmss update --resource-group $RESOURCEGROUP --name $VMSS \
     --set virtualMachineProfile.storageProfile.imageReference.sku=$(echo $LATESTBASEIMAGE|jq .sku|cut -d '"' -f 2) \
-        virtualMachineProfile.storageProfile.imageReference.version=$(echo $LATESTBASEIMAGE|jq .version|cut -d '"' -f 2)
+        virtualMachineProfile.storageProfile.imageReference.version=$(echo $LATESTBASEIMAGE|jq .version|cut -d '"' -f 2)| jq .virtualMachineProfile.storageProfile.imageReference
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating VMSS instances..."
 VMSSINSTANCES=$(kubectl get nodes|grep vmss |cut -d ' ' -f1)
 
 for ITEM in $VMSSINSTANCES; do
-    INSTANCEID=$(echo $ITEM|cut -c $(echo ${#ITEM}))
+    TEMPINSTANCEID=$(kubectl get nodes $ITEM -o yaml|grep providerID)
+    INSTANCEID=$(echo $TEMPINSTANCEID|cut -d '/' -f13)
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Draining node $ITEM..."
     kubectl drain $ITEM --ignore-daemonsets --delete-local-data --force
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating VMSS instance $ITEM..."
