@@ -1,11 +1,11 @@
 general:
   namespace: default
 image:
-  repository: neumanndaniel/figlet
+  repository: neumanndaniel/akscnicalc
   tag: 1.0.0
   pullPolicy: Always
 container:
-  name: function-figlet
+  name: function-akscnicalc
   port: 80
   requests:
     cpu: 25m
@@ -30,5 +30,5 @@ ambassador:
   enabled: false
   prefix: /
   hostEnabled: true
-  host: helloworld.trafficmanager.net
+  host: akscnicalc.trafficmanager.net
   timeout: 20000

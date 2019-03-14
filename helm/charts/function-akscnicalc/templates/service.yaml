@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "function-figlet.fullname" . }}
+  name: {{ template "function-akscnicalc.fullname" . }}
   namespace: {{ .Values.general.namespace }}
   labels:
-    app: {{ template "function-figlet.name" . }}
+    app: {{ template "function-akscnicalc.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -13,12 +13,12 @@ metadata:
       ---
         apiVersion: ambassador/v0
         kind:  Mapping
-        name:  {{ template "function-figlet.fullname" . }}
+        name:  {{ template "function-akscnicalc.fullname" . }}
         prefix: {{ .Values.ambassador.prefix }}
         {{ if .Values.ambassador.hostEnabled }}
         host: {{ .Values.ambassador.host }}
         {{end}}
-        service: {{ template "function-figlet.fullname" . }}
+        service: {{ template "function-akscnicalc.fullname" . }}
         timeout_ms: {{ .Values.ambassador.timeout }}
   {{end}}
 spec:
@@ -27,5 +27,5 @@ spec:
   - port: {{ .Values.service.ports.port }}
     targetPort: {{ .Values.service.ports.targetPort }}
   selector:
-    app: {{ template "function-figlet.name" . }}
+    app: {{ template "function-akscnicalc.name" . }}
     release: {{ .Release.Name }}

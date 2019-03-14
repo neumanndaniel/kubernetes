@@ -1,0 +1,5 @@
+The Azure Function - HTTP trigger - AKS CNI calc is getting deployed on your cluster.
+
+To verify that the Azure Function - HTTP trigger - AKS CNI calc has started, run:
+
+  kubectl --namespace={{ .Release.Namespace }} get pods -l "app={{ template "function-akscnicalc.name" . }}" -l "release={{ .Release.Name }}"

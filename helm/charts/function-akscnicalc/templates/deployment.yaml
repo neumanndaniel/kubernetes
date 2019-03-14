@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "function-akscnicalc.fullname" . }}
+  namespace: {{ .Values.general.namespace }}
+  labels:
+    app: {{ template "function-akscnicalc.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: {{ template "function-akscnicalc.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "function-akscnicalc.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Values.container.name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.container.port }}
+        resources:
+          requests:
+            cpu: {{ .Values.container.requests.cpu }}
+            memory: {{ .Values.container.requests.memory }}
+          limits:
+            cpu: {{ .Values.container.limits.cpu }}
+            memory: {{ .Values.container.limits.memory }}

@@ -1,0 +1,3 @@
+name: function-akscnicalc
+version: 0.0.2
+description: A Helm chart to deploy an Azure Function - HTTP trigger - AKS CNI calc
