@@ -11,7 +11,7 @@ metadata:
   annotations: {{ if .Values.ambassador.enabled }}
     getambassador.io/config: |
       ---
-        apiVersion: ambassador/v0
+        apiVersion: ambassador/v1
         kind:  Mapping
         name:  {{ template "function-akscnicalc.fullname" . }}
         prefix: {{ .Values.ambassador.prefix }}
