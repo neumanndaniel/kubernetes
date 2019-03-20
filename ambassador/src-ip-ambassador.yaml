@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: src-ip
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: src-ip
+  template:
+    metadata:
+      labels:
+        app: src-ip
+    spec:
+      containers:
+      - name: src-ip
+        image: k8s.gcr.io/echoserver:1.10
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 25m
+          limits:
+            cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: src-ip
+  labels:
+    app: src-ip
+  annotations:
+    getambassador.io/config: |
+      ---
+        apiVersion: ambassador/v1
+        kind:  Mapping
+        name:  src-ip
+        prefix: /
+        host: src.trafficmanager.net
+        service: src-ip
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: src-ip
