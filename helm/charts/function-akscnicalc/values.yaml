@@ -18,7 +18,7 @@ hpa:
   maxReplicas: 20
   metrics:
     cpu:
-      targetAverageUtilization: 10
+      targetAverageUtilization: 20
 service:
   noIngress: true
   type: LoadBalancer
