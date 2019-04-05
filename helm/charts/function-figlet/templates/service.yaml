@@ -18,8 +18,12 @@ metadata:
         {{ if .Values.ambassador.hostEnabled }}
         host: {{ .Values.ambassador.host }}
         {{end}}
-        service: {{ template "function-figlet.fullname" . }}
+        service: {{ template "function-figlet.fullname" . }}{{ if .Values.linkerd.enabled }}.{{ .Values.general.namespace }}.svc.cluster.local{{end}}
         timeout_ms: {{ .Values.ambassador.timeout }}
+        {{ if .Values.linkerd.enabled }}
+        add_request_headers:
+          l5d-dst-override: {{ template "function-figlet.fullname" . }}.{{ .Values.general.namespace }}.svc.cluster.local:{{ .Values.service.ports.port }}
+        {{end}}
   {{end}}
 spec:
   type: {{ if .Values.service.noIngress }} {{ .Values.service.type }} {{end}}
