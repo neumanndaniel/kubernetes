@@ -32,3 +32,6 @@ ambassador:
   hostEnabled: true
   host: akscnicalc.trafficmanager.net
   timeout: 20000
+#Use only when running Ambassador (https://www.getambassador.io/) and Linkerd (https://linkerd.io/) on your Kubernetes cluster and service.noIngress is set to false
+linkerd:
+  enabled: false
