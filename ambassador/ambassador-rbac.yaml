@@ -82,7 +82,7 @@ spec:
         image: quay.io/datawire/ambassador:0.60.1
         resources:
           limits:
-            cpu: 400m
+            cpu: 1
             memory: 400Mi
           requests:
             cpu: 200m
