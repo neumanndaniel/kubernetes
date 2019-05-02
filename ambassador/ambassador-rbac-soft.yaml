@@ -74,10 +74,10 @@ spec:
               labelSelector:
                 matchExpressions:
                 - key: service
-                    operator: In
-                    values:
-                    - ambassador
-            topologyKey: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - ambassador
+              topologyKey: kubernetes.io/hostname
       serviceAccountName: ambassador
       containers:
       - name: ambassador
