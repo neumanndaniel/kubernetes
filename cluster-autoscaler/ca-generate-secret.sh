@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 ID=$(az account show --query id)
 SUBSCRIPTION_ID=$(echo -n $ID | tr -d '"')
 
