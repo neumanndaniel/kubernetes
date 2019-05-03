@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 MSIENABLED=$(sudo cat /etc/kubernetes/azure.json | grep aadClientId | cut -d '"' -f4)
 if [ "$MSIENABLED" = "msi" ]
