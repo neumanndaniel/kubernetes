@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azp-agent
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: azp-agent
+  template:
+    metadata:
+      labels:
+        app: azp-agent
+    spec:
+      imagePullSecrets:
+        - name: REDACTED
+      containers:
+      - name: azp-agent
+        image: REDACTED.azurecr.io/azp:0.0.1
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: AZP_URL
+            valueFrom:
+              secretKeyRef:
+                name: azp
+                key: AZP_URL
+          - name: AZP_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: azp
+                key: AZP_TOKEN
+          - name: AZP_POOL
+            value: k3s
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: docker-volume
+      volumes:
+      - name: docker-volume
+        hostPath:
+          path: /var/run/docker.sock'
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+      nodeSelector:
+        kubernetes.io/role: master
