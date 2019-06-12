@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -e
+set -o pipefail
+
 RPHOSTNAME=$1
 RPMOUNTPATH=$2
 PUBLICSSHKEY=$3
