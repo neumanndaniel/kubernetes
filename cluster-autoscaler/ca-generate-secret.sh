@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -e
+set -o pipefail
+
 ID=$(az account show --query id)
 SUBSCRIPTION_ID=$(echo -n $ID | tr -d '"')
 
