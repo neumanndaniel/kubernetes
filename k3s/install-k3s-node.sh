@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -e
+set -o pipefail
+
 K3SMASTER=$1
 K3SMASTERIPADDRESS=$2
 NODE_TOKEN=$3
