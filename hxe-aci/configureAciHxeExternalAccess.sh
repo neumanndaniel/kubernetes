@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -e
+set -o pipefail
+
 globalpath=$(find /hana -name global.ini | awk -F global.ini '{ print $1 }') \
     && cd $globalpath \
     && chmod 777 global.ini \
