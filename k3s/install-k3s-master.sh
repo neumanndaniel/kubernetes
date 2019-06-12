@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 MASTER=$(hostname)
 
 curl -sfL https://get.k3s.io -o install.sh
