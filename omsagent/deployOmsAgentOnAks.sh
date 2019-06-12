@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 omsWorkspaceName=$1
 resourceGroupName=$2
 gitHubTemplateUri='https://raw.githubusercontent.com/neumanndaniel/armtemplates/master/output/logAnalyticsWorkspace.json'
