@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -e
+set -o pipefail
+
 resourceGroupName='aks-demo-rg'
 aksClusterName='aks-demo-cluster'
 aksAciConnectorName='aciconnector'
