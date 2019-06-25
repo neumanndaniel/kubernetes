@@ -9,8 +9,7 @@ PUBLICSSHKEY=$3
 RPTIMEZONE=$4
 
 IMAGE=$(ls raspbian.img)
-if [ -z "$IMAGE" ]
-then
+if [ -z "$IMAGE" ]; then
     wget https://downloads.raspberrypi.org/raspbian_lite_latest -O raspbian.zip
     unzip raspbian.zip
     mv *.img raspbian.img
