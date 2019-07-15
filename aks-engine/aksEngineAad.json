@@ -1,0 +1,105 @@
+{
+  "apiVersion": "vlabs",
+  "properties": {
+    "orchestratorProfile": {
+      "orchestratorType": "Kubernetes",
+      "orchestratorRelease": "1.15",
+      "orchestratorVersion": "1.15.0",
+      "kubernetesConfig": {
+        "kubeletConfig": {
+          "--max-pods": "110"
+        },
+        "controllerManagerConfig": {
+          "--feature-gates": "ServiceNodeExclusion=true"
+        },
+        "useManagedIdentity": true,
+        "loadBalancerSku": "standard",
+        "networkPlugin": "azure",
+        "networkPolicy": "azure",
+        "containerRuntime": "docker",
+        "mobyVersion": "3.0.5",
+        "enablePodSecurityPolicy": true,
+        "enableRbac": true,
+        "etcdDiskSizeGB": "256",
+        "useInstanceMetadata": true,
+        "kubeProxyMode": "iptables",
+        "addons": [
+          {
+            "name": "tiller",
+            "enabled": true
+          },
+          {
+            "name": "kubernetes-dashboard",
+            "enabled": false
+          },
+          {
+            "name": "cluster-autoscaler",
+            "enabled": false
+          },
+          {
+            "name": "container-monitoring",
+            "enabled": false
+          },
+          {
+            "name": "blobfuse-flexvolume",
+            "enabled": false
+          },
+          {
+            "name": "smb-flexvolume",
+            "enabled": false
+          },
+          {
+            "name": "keyvault-flexvolume",
+            "enabled": false
+          },
+          {
+            "name": "aad-pod-identity",
+            "enabled": false
+          }
+        ],
+        "privateCluster": {
+          "enabled": false
+        }
+      }
+    },
+    "masterProfile": {
+      "count": 1,
+      "dnsPrefix": "azst-akse1",
+      "vmSize": "Standard_D2_v3",
+      "distro": "aks-ubuntu-18.04",
+      "osDiskSizeGB": 30,
+      "storageProfile": "ManagedDisks",
+      "availabilityProfile": "AvailabilitySet",
+      "cosmosEtcd": false
+    },
+    "agentPoolProfiles": [
+      {
+        "name": "nodepool1",
+        "count": 2,
+        "vmSize": "Standard_D2_v3",
+        "osType": "Linux",
+        "distro": "aks-ubuntu-18.04",
+        "osDiskSizeGB": 30,
+        "storageProfile": "ManagedDisks",
+        "availabilityProfile": "VirtualMachineScaleSets",
+        "vmssOverProvisioningEnabled": true
+      }
+    ],
+    "aadProfile": {
+      "clientAppID": "REDACTED",
+      "serverAppID": "REDACTED",
+      "adminGroupID": "REDACTED",
+      "tenantID": "REDACTED"
+    },
+    "linuxProfile": {
+      "adminUsername": "azcdmdn",
+      "ssh": {
+        "publicKeys": [
+          {
+            "keyData": "REDACTED"
+          }
+        ]
+      }
+    }
+  }
+}
