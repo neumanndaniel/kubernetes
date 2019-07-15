@@ -92,7 +92,7 @@
       "tenantID": "REDACTED"
     },
     "linuxProfile": {
-      "adminUsername": "azcdmdn",
+      "adminUsername": "azureuser",
       "ssh": {
         "publicKeys": [
           {
