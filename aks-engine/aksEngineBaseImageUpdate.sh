@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -e
-set -o pipefail
-
 MSIENABLED=$(sudo cat /etc/kubernetes/azure.json | grep aadClientId | cut -d '"' -f4)
 if [[ "$MSIENABLED" = "msi" ]]; then
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] AKS Engine cluster uses MSI and is therefore supported by the script. Script continues..."
@@ -26,6 +23,9 @@ if [[ -z "$AZCLI" ]]; then
 else
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Azure CLI installed. Script continues with updating the base image..."
 fi
+
+set -e
+set -o pipefail
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Logging in to Azure via Managed Service Identity..."
 NULL=$(az login --identity)
