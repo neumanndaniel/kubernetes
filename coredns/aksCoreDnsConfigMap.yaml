@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  Corefile.override: |
+        forward . 8.8.8.8 8.8.4.4
+  azure.server: |
+    internal.cloudapp.net:53 {
+        errors
+        cache 30
+        proxy . 168.63.129.16
+    }
