@@ -1,15 +1,15 @@
 #!/bin/bash
 
-MSIENABLED=$(sudo cat /etc/kubernetes/azure.json | grep aadClientId | cut -d '"' -f4)
-if [[ "$MSIENABLED" = "msi" ]]; then
+MSI_ENABLED=$(sudo cat /etc/kubernetes/azure.json|grep aadClientId|cut -d '"' -f4)
+if [[ "$MSI_ENABLED" = "msi" ]]; then
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] AKS Engine cluster uses MSI and is therefore supported by the script. Script continues..."
 else
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] AKS Engine cluster does not use MSI and is not supported by the script. Exiting the script..."
     exit
 fi
 
-AZCLI=$(which az)
-if [[ -z "$AZCLI" ]]; then
+AZ_CLI=$(which az)
+if [[ -z "$AZ_CLI" ]]; then
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] No Azure CLI installed. Installing Azure CLI..."
     sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y
     AZ_REPO=$(lsb_release -cs)
@@ -32,37 +32,37 @@ NULL=$(az login --identity)
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Gathering information about the Kubernetes cluster and the latest base image..."
 VMSS=$(kubectl get nodes|grep vmss --max-count=1|cut -d ' ' -f1|rev|cut -c 7-|rev)
-RESOURCEGROUP=$(kubectl get node $(kubectl get nodes|grep vmss --max-count=1| cut -d ' ' -f 1) -o json | jq .metadata.labels|grep kubernetes.azure.com/cluster|cut -d '"' -f4)
+RESOURCE_GROUP=$(kubectl get node $(kubectl get nodes|grep vmss --max-count=1|cut -d ' ' -f 1) -o json|jq '.metadata.labels'|grep kubernetes.azure.com/cluster|cut -d '"' -f4)
 
-VMSSPROPERTIES=$(az vmss show --resource-group $RESOURCEGROUP --name $VMSS)
-OFFER=$(echo $VMSSPROPERTIES| jq .virtualMachineProfile.storageProfile.imageReference.offer|cut -d '"' -f 2)
-PUBLISHER=$(echo $VMSSPROPERTIES| jq .virtualMachineProfile.storageProfile.imageReference.publisher|cut -d '"' -f 2)
-SKUTEMP=$(echo $VMSSPROPERTIES| jq .virtualMachineProfile.storageProfile.imageReference.sku|cut -d '"' -f 2|rev|cut -c 7-|rev)
-SKU=$SKUTEMP$(date +"%Y%m")
+VMSS_PROPERTIES=$(az vmss show --resource-group $RESOURCE_GROUP --name $VMSS)
+OFFER=$(echo $VMSS_PROPERTIES| jq '.virtualMachineProfile.storageProfile.imageReference.offer'|cut -d '"' -f 2)
+PUBLISHER=$(echo $VMSS_PROPERTIES| jq '.virtualMachineProfile.storageProfile.imageReference.publisher'|cut -d '"' -f 2)
+SKU_TEMP=$(echo $VMSS_PROPERTIES| jq '.virtualMachineProfile.storageProfile.imageReference.sku'|cut -d '"' -f 2|rev|cut -c 7-|rev)
+SKU=$SKU_TEMP$(date +"%Y%m")
 
-BASEIMAGES=$(az vm image list --offer $OFFER --publisher $PUBLISHER --sku $SKU --all)
-if [[ $(echo $BASEIMAGES | jq length) -eq 0 ]]; then
-    SKU=$SKUTEMP$(date +"%Y%m" --date="last month")
-    BASEIMAGES=$(az vm image list --offer $OFFER --publisher $PUBLISHER --sku $SKU --all)
+BASE_IMAGES=$(az vm image list --offer $OFFER --publisher $PUBLISHER --sku $SKU --all)
+if [[ $(echo $BASE_IMAGES|jq length) -eq 0 ]]; then
+    SKU=$SKU_TEMP$(date +"%Y%m" --date="last month")
+    BASE_IMAGES=$(az vm image list --offer $OFFER --publisher $PUBLISHER --sku $SKU --all)
 fi
-BASEIMAGESCOUNT=$(echo $BASEIMAGES|jq length)
-LATESTBASEIMAGE=$(echo $BASEIMAGES| jq .[$BASEIMAGECOUNT-1])
+BASE_IMAGE_COUNT=$(echo $BASE_IMAGES|jq length)
+LATESTBASEIMAGE=$(echo $BASE_IMAGES|jq ".[$BASE_IMAGE_COUNT-1]")
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating base image..."
-az vmss update --resource-group $RESOURCEGROUP --name $VMSS \
-    --set virtualMachineProfile.storageProfile.imageReference.sku=$(echo $LATESTBASEIMAGE|jq .sku|cut -d '"' -f 2) \
-    virtualMachineProfile.storageProfile.imageReference.version=$(echo $LATESTBASEIMAGE|jq .version|cut -d '"' -f 2)| jq .virtualMachineProfile.storageProfile.imageReference
+az vmss update --resource-group $RESOURCE_GROUP --name $VMSS \
+    --set virtualMachineProfile.storageProfile.imageReference.sku=$(echo $LATESTBASEIMAGE|jq '.sku'|cut -d '"' -f 2) \
+    virtualMachineProfile.storageProfile.imageReference.version=$(echo $LATESTBASEIMAGE|jq '.version'|cut -d '"' -f 2)|jq '.virtualMachineProfile.storageProfile.imageReference'
 
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating VMSS instances..."
-VMSSINSTANCES=$(kubectl get nodes|grep vmss |cut -d ' ' -f1)
+VMSS_INSTANCES=$(kubectl get nodes|grep vmss|cut -d ' ' -f1)
 
-for ITEM in $VMSSINSTANCES; do
-    TEMPINSTANCEID=$(kubectl get nodes $ITEM -o yaml|grep providerID)
-    INSTANCEID=$(echo $TEMPINSTANCEID|cut -d '/' -f13)
+for ITEM in $VMSS_INSTANCES; do
+    TEMP_INSTANCE_ID=$(kubectl get nodes $ITEM -o yaml|grep providerID)
+    INSTANCE_ID=$(echo $TEMP_INSTANCE_ID|cut -d '/' -f13)
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Draining node $ITEM..."
     kubectl drain $ITEM --ignore-daemonsets --delete-local-data --force
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updating VMSS instance $ITEM..."
-    az vmss update-instances --instance-ids $INSTANCEID --name $VMSS --resource-group $RESOURCEGROUP
+    az vmss update-instances --instance-ids $INSTANCE_ID --name $VMSS --resource-group $RESOURCE_GROUP
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Uncordon node $ITEM..."
     kubectl uncordon $ITEM
 done
