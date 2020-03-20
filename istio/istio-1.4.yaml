@@ -1,0 +1,91 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioControlPlane
+spec:
+  gateways:
+    components:
+      ingressGateway:
+        enabled: true
+        k8s:
+          hpaSpec:
+            minReplicas: 2
+          overlays:
+          - apiVersion: v1
+            kind: Service
+            name: istio-ingressgateway
+            patches:
+            - path: spec.ports
+              value:
+              - name: status-port
+                port: 15020
+                targetPort: 15020
+              - name: http2
+                port: 80
+                targetPort: 80
+              - name: https
+                port: 443
+                targetPort: 443
+  trafficManagement:
+    components:
+      pilot:
+        enabled: true
+        k8s:
+          hpaSpec:
+            minReplicas: 2
+  policy:
+    components:
+      policy:
+        enabled: true
+        k8s:
+          hpaSpec:
+            minReplicas: 2
+  telemetry:
+    components:
+      telemetry:
+        enabled: true
+        k8s:
+          hpaSpec:
+            minReplicas: 2
+  configManagement:
+    components:
+      galley:
+        enabled: true
+        k8s:
+          replicaCount: 2
+  autoInjection:
+    components:
+      injector:
+        enabled: true
+        k8s:
+          replicaCount: 2
+          podDisruptionBudget:
+            selector:
+              matchLabels:
+                app: sidecarInjectorWebhook
+  security:
+    components:
+      citadel:
+        enabled: true
+        k8s:
+          replicaCount: 2
+  values:
+    global:
+      mtls:
+        enabled: true
+      controlPlaneSecurityEnabled: true
+      proxy:
+        accessLogFile: "/dev/stdout"
+        accessLogEncoding: "JSON"
+    gateways:
+      istio-ingressgateway:
+        sds:
+          enabled: true
+    sidecarInjectorWebhook:
+      rewriteAppHTTPProbe: true
+    grafana:
+      enabled: true
+    tracing:
+      enabled: true
+    kiali:
+      enabled: true
+    prometheus:
+      enabled: true
