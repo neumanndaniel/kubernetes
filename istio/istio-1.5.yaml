@@ -11,6 +11,8 @@ spec:
     prometheus:
       enabled: true
   components:
+    cni:
+      enabled: true
     ingressGateways:
     - enabled: true
       k8s:
@@ -37,15 +39,15 @@ spec:
       k8s:
         hpaSpec:
           minReplicas: 2
-        overlays:
-        - apiVersion: policy/v1beta1
-          kind: PodDisruptionBudget
-          name: istiod
-          patches:
-          - path: spec.selector.matchLabels
-            value:
-              app: istiod
-              istio: pilot
+#         overlays:
+#         - apiVersion: policy/v1beta1
+#           kind: PodDisruptionBudget
+#           name: istiod
+#           patches:
+#           - path: spec.selector.matchLabels
+#             value:
+#               app: istiod
+#               istio: pilot
   values:
     global:
       mtls:
@@ -54,6 +56,12 @@ spec:
       proxy:
         accessLogFile: "/dev/stdout"
         accessLogEncoding: "JSON"
+    cni:
+      excludeNamespaces:
+       - istio-system
+       - kube-system
+       - kube-node-lease
+       - kube-public
     gateways:
       istio-ingressgateway:
         sds:
