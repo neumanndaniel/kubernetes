@@ -4,7 +4,10 @@ metadata:
   name: pod-no-serviceaccount-automount
 spec:
   match:
-    excludedNamespaces: {{ .Values.excludedNamespaces }}
+    excludedNamespaces:
+      - kube-system
+      - istio-system
+      - gatekeeper-system
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
