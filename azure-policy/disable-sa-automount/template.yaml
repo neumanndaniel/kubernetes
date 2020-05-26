@@ -1,0 +1,26 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisableserviceaccountautomount
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisableServiceAccountAutoMount
+        listKind: K8sDisableServiceAccountAutoMountList
+        plural: k8sdisableserviceaccountautomount
+        singular: k8sdisableserviceaccountautomount
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisableserviceaccountautomount
+
+        violation[{"msg": msg, "details": {}}] {
+            p := input_pod[_]
+            p.spec.automountServiceAccountToken
+            msg := sprintf("Service Account token automount is not allowed: %v, spec: %v", [p.metadata.name, p.spec.automountServiceAccountToken])
+        }
+
+        input_pod[p] {
+            p := input.review.object
+        }
