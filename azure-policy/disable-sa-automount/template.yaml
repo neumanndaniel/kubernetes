@@ -15,6 +15,17 @@ spec:
       rego: |
         package k8sdisableserviceaccountautomount
 
+        missing(obj) = true {
+          not obj.automountServiceAccountToken == true
+          not obj.automountServiceAccountToken == false
+        }
+        
+        violation[{"msg": msg}] {
+          p := input_pod[_]
+          missing(p.spec)
+          msg := sprintf("automountServiceAccountToken field is missing: %v", [p.metadata.name])
+        }
+
         violation[{"msg": msg, "details": {}}] {
             p := input_pod[_]
             p.spec.automountServiceAccountToken
