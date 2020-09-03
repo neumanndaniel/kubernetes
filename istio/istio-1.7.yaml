@@ -19,7 +19,6 @@ spec:
       enabled: true
     cni:
       enabled: true
-      # tag: 1.6.8
     ingressGateways:
     - enabled: true
       name: istio-ingressgateway
