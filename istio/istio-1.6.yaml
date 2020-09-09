@@ -1,6 +1,7 @@
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
+  tag: 1.6.8-distroless
   addonComponents:
     grafana:
       enabled: true
@@ -15,6 +16,7 @@ spec:
       enabled: true
     cni:
       enabled: true
+      tag: 1.6.8
     ingressGateways:
     - enabled: true
       k8s:
