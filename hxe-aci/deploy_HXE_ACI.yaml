@@ -15,7 +15,7 @@ spec:
   - name: docker-secret
   containers:
   - name: aci-hxe-instance
-    image: "registry-1.docker.io/store/saplabs/hanaexpress:2.00.030.00.20180403.2"
+    image: "registry-1.docker.io/store/saplabs/hanaexpress:2.00.045.00.20200121.1"
     resources:
       requests:
         memory: 14G
