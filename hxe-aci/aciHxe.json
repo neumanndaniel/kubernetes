@@ -7,7 +7,7 @@
             "type": "string"
         },
         "containerImage": {
-            "defaultValue": "registry-1.docker.io/store/saplabs/hanaexpress:2.00.030.00.20180403.2",
+            "defaultValue": "registry-1.docker.io/store/saplabs/hanaexpress:2.00.045.00.20200121.1",
             "type": "string"
         },
         "imageRegistryLoginServer": {
