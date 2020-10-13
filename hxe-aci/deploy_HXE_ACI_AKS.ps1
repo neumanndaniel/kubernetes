@@ -5,7 +5,7 @@ $gitHubAciHxeAksUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/
 #Prepare deployment files and create master password secret
 $credential=Get-Credential -UserName hxeMasterPassword
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($credential.Password)
-$masterPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+$masterPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
 
 $jsonDefinition='{'+'"'+'master_password'+'"'+' : '+'"'+$masterPassword+'"'+'}'
 $jsonEncoded=Write-Output $jsonDefinition|base64
@@ -30,7 +30,7 @@ kubectl apply -f ./secrets.yaml
 #Enter Docker account details and create docker registry secret
 $credential=Get-Credential -Title 'Enter Docker account username and password'
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($credential.Password)
-$dockerPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+$dockerPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
 $dockerEmail=Read-Host 'Enter e-mail address of your Docker account'
 $dockerUsername=$credential.UserName
 
