@@ -2,7 +2,7 @@
 $resourceGroupName='aci-hxe-rg'
 $aciInstance='aci-hxe-instance'
 $fileShareName='hxe-config'
-$aciHxeImage='registry-1.docker.io/store/saplabs/hanaexpress:2.00.030.00.20180403.2'
+$aciHxeImage='registry-1.docker.io/store/saplabs/hanaexpress:2.00.045.00.20200121.1'
 $registryLoginServer='registry-1.docker.io'
 $gitHubAciHxeUri='https://raw.githubusercontent.com/neumanndaniel/kubernetes/master/hxe-aci/aciHxe.json'
 
@@ -32,7 +32,7 @@ az group create --name $resourceGroupName --location $azureRegion --output table
 #Prepare deployment files and create master password JSON
 $credential=Get-Credential -UserName hxeMasterPassword
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($credential.Password)
-$masterPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+$masterPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
 
 $jsonDefinition='{'+'"'+'master_password'+'"'+' : '+'"'+$masterPassword+'"'+'}'
 
@@ -55,7 +55,7 @@ $storageAccountKeys = az storage account keys list --account-name $storageAccoun
 #Enter Docker account details and create docker registry secret
 $credential=Get-Credential -Title 'Enter Docker account username and password'
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($credential.Password)
-$dockerPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+$dockerPassword=[System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
 $dockerUsername=$credential.UserName
 
 #HANA Express Edition deployment on ACI
