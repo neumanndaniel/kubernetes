@@ -14,7 +14,8 @@ spec:
     cni:
       enabled: true
     ingressGateways:
-    - enabled: true
+    - name: istio-ingressgateway
+      enabled: true
       k8s:
         hpaSpec:
           maxReplicas: 1
