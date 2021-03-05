@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratelimit
+  namespace: ratelimit
+  labels:
+    app: ratelimit
+    version: v1
+spec:
+  ports:
+    - name: http-ratelimit
+      port: 8080
+      targetPort: 8080
+    - name: http-debug
+      port: 6070
+      targetPort: 6070
+    - name: grpc-ratelimit
+      port: 8081
+      targetPort: 8081
+    - name: http-prometheus-metrics
+      port: 9102
+      targetPort: 9102
+    - name: http-statsd-exporter
+      port: 9125
+      targetPort: 9125
+  selector:
+    app: ratelimit
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratelimit
+  namespace: ratelimit
+  labels:
+    app: ratelimit
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ratelimit
+  template:
+    metadata:
+      labels:
+        app: ratelimit
+        version: v1
+    spec:
+      containers:
+        - name: ratelimit
+          image: docker.io/envoyproxy/ratelimit:40393342
+          imagePullPolicy: Always
+          command: ["/bin/ratelimit"]
+          ports:
+            - containerPort: 8080
+            - containerPort: 8081
+            - containerPort: 6070
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          env:
+            - name: USE_STATSD
+              value: "true"
+            - name: STATSD_HOST
+              value: "localhost"
+            - name: STATSD_PORT
+              value: "9125"
+            - name: LOG_FORMAT
+              value: "json"
+            - name: LOG_LEVEL
+              value: "debug"
+            - name: REDIS_SOCKET_TYPE
+              value: "tcp"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: url
+            - name: REDIS_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: password
+            - name: REDIS_TLS
+              value: "true"
+            - name: REDIS_POOL_SIZE
+              value: "5"
+            - name: LOCAL_CACHE_SIZE_IN_BYTES # 25 MB local cache
+              value: "26214400"
+            - name: RUNTIME_ROOT
+              value: "/data"
+            - name: RUNTIME_SUBDIRECTORY
+              value: "runtime"
+            - name: RUNTIME_WATCH_ROOT
+              value: "false"
+            - name: RUNTIME_IGNOREDOTFILES
+              value: "true"
+          volumeMounts:
+            - name: ratelimit-config
+              mountPath: /data/runtime/config
+        - name: statsd-exporter
+          image: docker.io/prom/statsd-exporter:v0.20.0
+          imagePullPolicy: Always
+          args: ["--statsd.mapping-config=/etc/statsd-exporter/config.yaml"]
+          ports:
+            - containerPort: 9125
+            - containerPort: 9102
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          volumeMounts:
+            - name: statsd-exporter-config
+              mountPath: /etc/statsd-exporter
+      volumes:
+        - name: ratelimit-config
+          configMap:
+            name: ratelimit-config
+        - name: statsd-exporter-config
+          configMap:
+            name: statsd-exporter-config

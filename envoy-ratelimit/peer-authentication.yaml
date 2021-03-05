@@ -1,0 +1,12 @@
+apiVersion: "security.istio.io/v1beta1"
+kind: "PeerAuthentication"
+metadata:
+  name: "ratelimit"
+  namespace: "ratelimit"
+spec:
+  selector:
+    matchLabels:
+      app: ratelimit
+  portLevelMtls:
+    8081:
+      mode: PERMISSIVE
