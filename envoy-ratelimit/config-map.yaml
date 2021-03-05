@@ -29,7 +29,7 @@ metadata:
   namespace: ratelimit
 data:
   config.yaml: |
-    mappings: # Requires statsd exporter >= v0.6.0 since it uses the "drop" action.
+    mappings: # Example config from https://github.com/envoyproxy/ratelimit/blob/main/examples/prom-statsd-exporter/conf.yaml
       - match:
           "ratelimit.service.rate_limit.*.*.near_limit"
         name: "ratelimit_service_rate_limit_near_limit"
