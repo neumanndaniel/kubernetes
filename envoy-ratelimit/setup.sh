@@ -9,3 +9,4 @@ kubectl apply -f config-map.yaml
 kubectl apply -f network-policy.yaml
 kubectl apply -f peer-authentication.yaml
 kubectl apply -f deployment.yaml
+kubectl apply -f envoyfilter-global.yaml
