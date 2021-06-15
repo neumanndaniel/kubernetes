@@ -10,3 +10,4 @@ kubectl apply -f network-policy.yaml
 kubectl apply -f peer-authentication.yaml
 kubectl apply -f deployment.yaml
 kubectl apply -f envoyfilter-global.yaml
+kubectl apply -f container-azm-ms-agentconfig.yaml

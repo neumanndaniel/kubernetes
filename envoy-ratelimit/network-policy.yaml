@@ -27,3 +27,27 @@ spec:
               istio: ingressgateway
       ports:
         - port: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-oms-agent
+  namespace: ratelimit
+spec:
+  podSelector:
+    matchLabels:
+      app: ratelimit
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              rsName: omsagent-rs
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              component: oms-agent
+      ports:
+        - port: 9102

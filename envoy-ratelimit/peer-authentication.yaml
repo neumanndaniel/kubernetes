@@ -10,3 +10,5 @@ spec:
   portLevelMtls:
     8081:
       mode: PERMISSIVE
+    9102:
+      mode: PERMISSIVE

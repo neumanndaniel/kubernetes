@@ -44,10 +44,16 @@ spec:
       labels:
         app: ratelimit
         version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9102"
+        prometheus.istio.io/merge-metrics: "false"
     spec:
       containers:
         - name: ratelimit
-          image: docker.io/envoyproxy/ratelimit:40393342
+          image: docker.io/envoyproxy/ratelimit:6aaad7c3
           imagePullPolicy: Always
           command: ["/bin/ratelimit"]
           ports:
@@ -109,7 +115,7 @@ spec:
             - name: ratelimit-config
               mountPath: /data/runtime/config
         - name: statsd-exporter
-          image: docker.io/prom/statsd-exporter:v0.20.0
+          image: docker.io/prom/statsd-exporter:v0.21.0
           imagePullPolicy: Always
           args: ["--statsd.mapping-config=/etc/statsd-exporter/config.yaml"]
           ports:
