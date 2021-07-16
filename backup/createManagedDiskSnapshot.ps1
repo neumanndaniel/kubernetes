@@ -23,9 +23,9 @@ Param
 $connectionName = "AzureRunAsConnection"
 try {
     $servicePrincipalConnection = Get-AutomationConnection -Name $connectionName
-    $null = Add-AzureRmAccount `
+    $null = Add-AzAccount `
         -ServicePrincipal `
-        -TenantId $servicePrincipalConnection.TenantId `
+        -Tenant $servicePrincipalConnection.TenantId `
         -ApplicationId $servicePrincipalConnection.ApplicationId `
         -CertificateThumbprint $servicePrincipalConnection.CertificateThumbprint
 }
@@ -44,45 +44,45 @@ catch {
 $parameterInput = ($managedDiskResourceId -split "/")
 $diskName = $parameterInput[8]
 $resourceGroup = $parameterInput[4]
-$managedDisk = Get-AzureRmDisk -ResourceGroupName $resourceGroup -DiskName $diskName
+$managedDisk = Get-AzDisk -ResourceGroupName $resourceGroup -DiskName $diskName
 $date = Get-Date
 
 $storageParameterInput = ($storageAccountResourceId -split "/")
 $storageAccountName = $storageParameterInput[8]
 $resourceGroupStorage = $storageParameterInput[4]
 
-$resourceGroupCheck = Get-AzureRmResourceGroup -Name $resourceGroupName -Location $managedDisk.Location
+$resourceGroupCheck = Get-AzResourceGroup -Name $resourceGroupName -Location $managedDisk.Location
 if (!$resourceGroupCheck) {
     "Initial resource group setup..."
-    New-AzureRmResourceGroup -Name $resourceGroupName -Location $managedDisk.Location
+    New-AzResourceGroup -Name $resourceGroupName -Location $managedDisk.Location
 }
 
 "Creating snapshot..."
-$snapshotConfig = New-AzureRmSnapshotConfig `
-    -SourceResourceId $managedDiskResourceId -Location $managedDisk.location -SkuName Standard_LRS `
+$snapshotConfig = New-AzSnapshotConfig `
+    -SourceResourceId $managedDiskResourceId -Location $managedDisk.location -SkuName Standard_ZRS `
     -CreateOption copy -Tag @{createdOn = "$date"; retentionTime = "$retentionTime"}
 
 $snapshotName = $diskName + "-" + $date.Year + "-" + $date.Month + "-" + $date.Day + "-" + $date.Hour + "-" + $date.Minute
-$snapshot = New-AzureRmSnapshot -ResourceGroupName $resourceGroupName -SnapshotName $snapshotName -Snapshot $snapshotConfig
+$snapshot = New-AzSnapshot -ResourceGroupName $resourceGroupName -SnapshotName $snapshotName -Snapshot $snapshotConfig
 
 
 "Getting storage context..."
-$storageContext = (Get-AzureRmStorageAccount -ResourceGroupName $resourceGroupStorage -Name $storageAccountName).Context
-$table = Get-AzureStorageTable -Name $storageTableName -Context $storageContext
+$storageContext = (Get-AzStorageAccount -ResourceGroupName $resourceGroupStorage -Name $storageAccountName).Context
+$table = (Get-AzStorageTable -Name $storageTableName -Context $storageContext).CloudTable
 
 "Writing table..."
 $dateParitionKey = [String]$date.Year + "-" + [String]$date.Month + "-" + [String]$date.Day
 $array = @{"azureRegion" = $managedDisk.Location; "retentionTime" = $retentionTime; "resourceId" = $snapshot.Id}
-Add-StorageTableRow -table $table -partitionKey $dateParitionKey -rowKey $snapshotName -property $array -ErrorAction Continue
+Add-AzTableRow -table $table -partitionKey $dateParitionKey -rowKey $snapshotName -property $array -ErrorAction Continue
 
 "Removing old backups..."
-[System.Collections.ArrayList]$backupTableStorage = (Get-AzureStorageTableRowAll $table)
+[System.Collections.ArrayList]$backupTableStorage = (Get-AzTableRowAll $table)
 $daysBack = "-" + $retentionTime
 $oldDate = (Get-Date).AddDays($daysBack)
 $oldDateParitionKey = [String]$oldDate.Year + "-" + [String]$oldDate.Month + "-" + [String]$oldDate.Day
 foreach ($item in $backupTableStorage) {
     if ($item.PartitionKey -eq $oldDateParitionKey) {
-        Remove-AzureStorageTableRow -table $table -partitionKey $item.PartitionKey -rowKey $item.RowKey -Verbose
-        Remove-AzureRmResource -ResourceId $item.resourceId -Force
+        Remove-AzTableRow -table $table -partitionKey $item.PartitionKey -rowKey $item.RowKey -Verbose
+        Remove-AzResource -ResourceId $item.resourceId -Force
     }
 }
