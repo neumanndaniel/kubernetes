@@ -5,12 +5,12 @@ set -e
 kind create cluster --config=single-node.yaml
 
 # Calico
-curl https://docs.projectcalico.org/manifests/calico.yaml | kubectl apply -f -
-
-# CoreDNS
-kubectl scale deployment --replicas 1 coredns --namespace kube-system
+kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
+kubectl apply -f ./calico-config.yaml
 
 # Metrics Server
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
-helm repo update
-helm upgrade metrics-server --install --set "args={--kubelet-insecure-tls, --kubelet-preferred-address-types=InternalIP}" stable/metrics-server --namespace kube-system
+helm upgrade metrics-server --install \
+--set apiService.create=true \
+--set extraArgs.kubelet-insecure-tls=true \
+--set extraArgs.kubelet-preferred-address-types=InternalIP \
+bitnami/metrics-server --namespace kube-system
