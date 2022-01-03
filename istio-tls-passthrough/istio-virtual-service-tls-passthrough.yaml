@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nginx
+  namespace: istio-config
+spec:
+  hosts:
+    - nginx.tls.danielstechblog.de
+  gateways:
+    - azst-aks-gateway
+  tls:
+    - match:
+        - port: 10443
+          sniHosts:
+            - nginx.tls.danielstechblog.de
+      route:
+        - destination:
+            host: my-nginx.nginx.svc.cluster.local
+            port:
+              number: 443

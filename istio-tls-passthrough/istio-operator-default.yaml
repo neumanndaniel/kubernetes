@@ -1,0 +1,57 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istiocontrolplane
+spec:
+  components:
+    base:
+      enabled: true
+    cni:
+      enabled: true
+    ingressGateways:
+      - enabled: true
+        name: istio-ingressgateway
+        k8s:
+          hpaSpec:
+            minReplicas: 2
+          overlays:
+            - apiVersion: v1
+              kind: Service
+              name: istio-ingressgateway
+              patches:
+                - path: spec.ports
+                  value:
+                    - name: status-port
+                      port: 15021
+                      targetPort: 15021
+                      protocol: TCP
+                    - name: http2
+                      port: 80
+                      targetPort: 8080
+                      protocol: TCP
+                    - name: https
+                      port: 443
+                      targetPort: 8443
+                      protocol: TCP
+    pilot:
+      enabled: true
+      k8s:
+        hpaSpec:
+          minReplicas: 2
+  meshConfig:
+    accessLogFile: "/dev/stdout"
+    accessLogEncoding: "JSON"
+  values:
+    global:
+      istiod:
+        enableAnalysis: true
+    cni:
+      excludeNamespaces:
+        - istio-system
+        - kube-system
+    pilot:
+      env:
+        PILOT_ENABLE_STATUS: true
+    sidecarInjectorWebhook:
+      rewriteAppHTTPProbe: true
