@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-gvisor
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  runtimeClassName: gvisor
+  tolerations:
+    - key: gvisor
+      operator: Equal
+      value: "enabled"
+      effect: NoSchedule
+  nodeSelector:
+    gvisor: enabled

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gvisor
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: gvisor
+  template:
+    metadata:
+      labels:
+        app: gvisor
+    spec:
+      hostPID: true
+      restartPolicy: Always
+      containers:
+      - image: docker.io/neumanndaniel/gvisor:latest
+        name: gvisor
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: k8s-node
+          mountPath: /k8s-node
+      volumes:
+      - name: k8s-node
+        hostPath:
+          path: /tmp/gvisor
+      tolerations:
+        - key: gvisor
+          operator: Equal
+          value: "enabled"
+          effect: NoSchedule
+      nodeSelector:
+        gvisor: enabled
