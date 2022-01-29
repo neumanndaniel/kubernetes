@@ -16,9 +16,16 @@ spec:
       restartPolicy: Always
       containers:
       - image: docker.io/neumanndaniel/gvisor:latest
+        imagePullPolicy: Always
         name: gvisor
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           privileged: true
+          readOnlyRootFilesystem: true
         volumeMounts:
         - name: k8s-node
           mountPath: /k8s-node

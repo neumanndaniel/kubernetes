@@ -3,3 +3,6 @@ kind: RuntimeClass
 metadata:
   name: gvisor
 handler: runsc
+scheduling:
+  nodeSelector:
+    gvisor: "enabled"
