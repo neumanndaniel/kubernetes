@@ -2,6 +2,8 @@ $ACRS = Get-AzContainerRegistry
 foreach ($ACR in $ACRS) {
   $REPOS = Get-AzContainerRegistryRepository -RegistryName $ACR.Name
   foreach ($REPO in $REPOS) {
+    Write-OutPut "########################"
+    Write-Output "Processing repository: $REPO"
     $MANIFESTS = (Get-AzContainerRegistryManifest -RegistryName $ACR.Name -RepositoryName $REPO).ManifestsAttributes | Where-Object { $_.Tags -eq $null } | Sort-Object -Property LastUpdateTime -Descending
     foreach ($ITEM in $MANIFESTS) {
       $TAG = $ITEM.digest
