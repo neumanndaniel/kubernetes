@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-stress
+  labels:
+    app: cpu-stress
+    version: v1
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: cpu-stress
+  template:
+    metadata:
+      labels:
+        app: cpu-stress
+        version: v1
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - northeurope-3
+      automountServiceAccountToken: false
+      containers:
+      - name: cpu-stress
+        image: containerstack/cpustress
+        imagePullPolicy: Always
+        args: ["--timeout", "3600s", "--cpu", "2"]
+        resources:
+          requests:
+            cpu: 0.5
+            memory: 128Mi
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
