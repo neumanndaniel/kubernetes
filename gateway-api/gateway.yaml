@@ -1,0 +1,38 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: gw-api
+  namespace: istio-system
+spec:
+  gatewayClassName: istio
+  listeners:
+    - name: http
+      hostname: "*.danielstechblog.de"
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+    - name: https
+      hostname: "*.danielstechblog.de"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              ingress-configuration: "true"
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: istio-ingress-cert
+            namespace: istio-system

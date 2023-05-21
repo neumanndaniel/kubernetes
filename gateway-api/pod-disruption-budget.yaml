@@ -1,0 +1,9 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: gw-api
+spec:
+  minAvailable: 50%
+  selector:
+    matchLabels:
+      istio.io/gateway-name: gw-api

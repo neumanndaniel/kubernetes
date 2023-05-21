@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: go-webapp
+  namespace: go-webapp
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: istio-config
+  to:
+    - group: ""
+      kind: Service
+      name: go-webapp-gw-api
