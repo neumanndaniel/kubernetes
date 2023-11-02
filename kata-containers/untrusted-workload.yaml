@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-kata-untrusted
+spec:
+  containers:
+  - name: nginx-kata-untrusted
+    image: nginx
+  runtimeClassName: kata-mshv-vm-isolation
+  tolerations:
+    - key: kata
+      operator: Equal
+      value: "enabled"
+      effect: NoSchedule
+  nodeSelector:
+    kata: enabled
