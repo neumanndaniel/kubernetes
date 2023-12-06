@@ -1,0 +1,50 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: azst-aks-gateway-redirect
+  namespace: istio-config
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - hosts:
+    - "*.danielstechblog.de"
+    port:
+      number: 80
+      name: http
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: azst-aks-gateway
+  namespace: istio-config
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - hosts:
+    - "*.danielstechblog.de"
+    port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: istio-ingress-cert
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: redirect
+  namespace: istio-config
+spec:
+  gateways:
+    - azst-aks-gateway-redirect
+  hosts:
+    - "*.danielstechblog.de"
+  http:
+    - name: redirect
+      redirect:
+        redirectCode: 307
+        scheme: https
