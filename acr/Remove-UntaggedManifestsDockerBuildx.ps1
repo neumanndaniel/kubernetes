@@ -2,7 +2,7 @@ $ACRS = Get-AzContainerRegistry
 foreach ($ACR in $ACRS) {
   $ACR_CREDS = Get-AzContainerRegistryCredential -ResourceGroupName $ACR.ResourceGroupName -Name $ACR.Name
   [PSCredential]$CREDENTIAL = New-Object System.Management.Automation.PSCredential ($ACR_CREDS.Username, (ConvertTo-SecureString $ACR_CREDS.Password -AsPlainText -Force))
-  $HEADERS = @{ 'accept' = 'application/vnd.docker.distribution.manifest.v2+json' }
+  $HEADERS = @{ 'accept' = 'application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.v2+json' }
   $ACR_URL = $ACR.LoginServer
   $REPOS = Get-AzContainerRegistryRepository -RegistryName $ACR.Name
   foreach ($REPO in $REPOS) {
