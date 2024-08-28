@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: logging
+  labels:
+    app: fluent-bit
+    version: v3.1.4
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+        version: v3.1.4
+        kubernetes.io/cluster-service: "true"
+    spec:
+      terminationGracePeriodSeconds: 75
+      containers:
+        - name: fluent-bit
+          # The image reference will be updated once the following pull request has been merged
+          # and a new Fluent Bit version is made available with the new Azure Data Explorer
+          # output plugin. https://github.com/fluent/fluent-bit/pull/8430
+          image: docker.io/agramachandran/fluent-bit:3.1.4-AMD64
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2020
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 2020
+            failureThreshold: 3
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          env:
+            - name: FLUENT_ADX_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azuredataexplorer
+                  key: tenant_id
+            - name: FLUENT_ADX_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azuredataexplorer
+                  key: client_id
+            - name: FLUENT_ADX_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: azuredataexplorer
+                  key: client_secret
+            - name: CLUSTER
+              value: aks-azst-1
+            - name: REGION
+              value: northeurope
+            - name: ENVIRONMENT
+              value: prod
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 750Mi
+            requests:
+              cpu: 75m
+              memory: 325Mi
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: fluent-bit-config
+              mountPath: /fluent-bit/etc/
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: fluent-bit-config
+          configMap:
+            name: fluent-bit-config
+      serviceAccountName: fluent-bit
+      priorityClassName: system-node-critical
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - operator: "Exists"
+          effect: "NoExecute"
+        - operator: "Exists"
+          effect: "NoSchedule"
