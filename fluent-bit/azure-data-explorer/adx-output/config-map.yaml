@@ -113,6 +113,7 @@ data:
         Rename kubernetes_docker_id       ContainerId
         Rename kubernetes_container_name  ContainerName
         Rename kubernetes_pod_id          PodId
+        Rename kubernetes_pod_ip          PodIp
         Rename kubernetes_host            Computer
         Rename stream                     LogSource
         Remove logtag
