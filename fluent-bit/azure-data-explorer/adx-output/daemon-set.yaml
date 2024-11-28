@@ -5,7 +5,7 @@ metadata:
   namespace: logging
   labels:
     app: fluent-bit
-    version: v3.1.4
+    version: v3.2.2
     kubernetes.io/cluster-service: "true"
 spec:
   selector:
@@ -15,16 +15,13 @@ spec:
     metadata:
       labels:
         app: fluent-bit
-        version: v3.1.4
+        version: v3.2.2
         kubernetes.io/cluster-service: "true"
     spec:
       terminationGracePeriodSeconds: 75
       containers:
         - name: fluent-bit
-          # The image reference will be updated once the following pull request has been merged
-          # and a new Fluent Bit version is made available with the new Azure Data Explorer
-          # output plugin. https://github.com/fluent/fluent-bit/pull/8430
-          image: docker.io/agramachandran/fluent-bit:3.1.4-AMD64
+          image: cr.fluentbit.io/fluent/fluent-bit:3.2.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2020

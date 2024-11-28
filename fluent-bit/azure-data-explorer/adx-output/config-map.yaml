@@ -136,4 +136,5 @@ data:
         compression_enabled         on
         ingestion_endpoint_connect_timeout 60
         ingestion_resources_refresh_interval 3600
-        buffering_enabled false
+        # Introducing PR is pending review
+        # buffering_enabled false
