@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit-kubernetes-events-read
+rules:
+  - apiGroups: [""]
+    resources:
+      - events
+      - namespaces
+      - pods
+    verbs:
+      - get
+      - list
+      - watch

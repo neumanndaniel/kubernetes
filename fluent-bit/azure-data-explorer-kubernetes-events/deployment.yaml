@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fluent-bit-kubernetes-events
+    version: v3.2.3
+    kubernetes.io/cluster-service: "true"
+  name: fluent-bit-kubernetes-events
+  namespace: logging
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: fluent-bit-kubernetes-events
+  template:
+    metadata:
+      labels:
+        app: fluent-bit-kubernetes-events
+        version: v3.2.3
+        kubernetes.io/cluster-service: "true"
+    spec:
+      terminationGracePeriodSeconds: 75
+      containers:
+        - name: fluent-bit-kubernetes-events
+          image: cr.fluentbit.io/fluent/fluent-bit:3.2.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2020
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 2020
+            failureThreshold: 3
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          env:
+            - name: FLUENT_ADX_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azuredataexplorer
+                  key: tenant_id
+            - name: FLUENT_ADX_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azuredataexplorer
+                  key: client_id
+            - name: FLUENT_ADX_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: azuredataexplorer
+                  key: client_secret
+            - name: CLUSTER
+              value: aks-azst-1
+            - name: REGION
+              value: northeurope
+            - name: ENVIRONMENT
+              value: prod
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: fluent-bit-kubernetes-events-config
+              mountPath: /fluent-bit/etc/
+            - name: fluent-bit-kubernetes-events-data
+              mountPath: /fluent-bit/data/
+          resources:
+            limits:
+              cpu: 500m
+              memory: 750Mi
+            requests:
+              cpu: 75m
+              memory: 325Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: fluent-bit-kubernetes-events-config
+          configMap:
+            name: fluent-bit-kubernetes-events-config
+        - name: fluent-bit-kubernetes-events-data
+          persistentVolumeClaim:
+            claimName: fluent-bit-kubernetes-events
+      serviceAccountName: fluent-bit-kubernetes-events
+      priorityClassName: system-cluster-critical

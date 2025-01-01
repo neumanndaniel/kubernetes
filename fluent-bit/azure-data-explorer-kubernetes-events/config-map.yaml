@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-kubernetes-events-config
+  namespace: logging
+data:
+  # General settings
+  # ======================================================
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush                     15
+        # Ensures that log chunks, where the flush failed previously, are flushed on container termination
+        Grace                     60
+        Log_Level                 info
+        Daemon                    Off
+        HTTP_Server               On
+        HTTP_Listen               0.0.0.0
+        HTTP_Port                 2020
+        Health_Check              On
+        HC_Errors_Count           5
+        HC_Retry_Failure_Count    5
+        HC_Period                 60
+        # Backpressue fallback
+        storage.path              /fluent-bit/data/flb-storage/
+        storage.sync              normal
+        storage.checksum          off
+        storage.backlog.mem_limit 50M
+
+    @INCLUDE input-kubernetes.conf
+    @INCLUDE filter-kubernetes.conf
+    @INCLUDE output-kubernetes.conf
+
+  # Kuberetes Events configuration
+  # ======================================================
+  input-kubernetes.conf: |
+    [INPUT]
+        Name                kubernetes_events
+        Alias               events_input
+        Tag                 kubernetes.events.*
+        DB                  /fluent-bit/data/flb_kubernetes_events.db
+        DB.sync             normal
+        kube_retention_time 1h
+        # Log_Level         warning
+
+  filter-kubernetes.conf: |
+    [FILTER]
+        Name         nest
+        Alias        events_filter_1
+        Match        kubernetes.events.*
+        Operation    lift
+        Nested_under involvedObject
+        Add_prefix   involvedObject_
+
+    [FILTER]
+        Name         nest
+        Alias        events_filter_2
+        Match        kubernetes.events.*
+        Operation    lift
+        Nested_under source
+        Add_prefix   source_
+
+    [FILTER]
+        Name         nest
+        Alias        events_filter_3
+        Match        kubernetes.events.*
+        Operation    lift
+        Nested_under metadata
+        Add_prefix   metadata_
+
+    [FILTER]
+        Name      modify
+        Alias     events_filter_4
+        Match     kubernetes.events.*
+        Condition Key_does_not_exist source_host
+        Add       source_host        ""
+
+    [FILTER]
+        Name      modify
+        Alias     events_filter_5
+        Match     kubernetes.events.*
+        Add       Cluster                    ${CLUSTER}
+        Add       Region                     ${REGION}
+        Add       Environment                ${ENVIRONMENT}
+        Rename    metadata_creationTimestamp CreationTimestamp
+        Rename    source_component           SourceComponent
+        Rename    source_host                SourceComputer
+        Rename    reportingComponent         ReportingComponent
+        Rename    reportingInstance          ReportingComputer
+        Rename    involvedObject_kind        Kind
+        Rename    involvedObject_apiVersion  ApiVersion
+        Rename    involvedObject_name        Name
+        Rename    involvedObject_namespace   Namespace
+        Rename    count                      Count
+        Rename    action                     Action
+        Rename    reason                     Reason
+        Rename    message                    Message
+        Rename    type                       KubeEventType
+        Rename    firstTimestamp             FirstSeen
+        Rename    lastTimestamp              LastSeen
+        Remove    metadata
+        Remove    involvedObject
+        Remove    source
+        Remove    eventTime
+        Remove    involvedObject_resourceVersion
+        Remove    involvedObject_uid
+        Remove    involvedObject_fieldPath
+        Remove    involvedObject_labels
+        Remove    involvedObject_annotations
+        Remove    metadata_name
+        Remove    metadata_namespace
+        Remove    metadata_uid
+        Remove    metadata_resourceVersion
+        Remove    metadata_managedFields
+
+  output-kubernetes.conf: |
+    [OUTPUT]
+        Name                        azure_kusto
+        Match                       kubernetes.events.*
+        Tenant_Id                   ${FLUENT_ADX_TENANT_ID}
+        Client_Id                   ${FLUENT_ADX_CLIENT_ID}
+        Client_Secret               ${FLUENT_ADX_CLIENT_SECRET}
+        Ingestion_Endpoint          https://ingest-adxaks.northeurope.kusto.windows.net
+        Database_Name               Kubernetes
+        Table_Name                  KubeEvents
+        Ingestion_Mapping_Reference FluentBitMappingEvents
+        Log_Key                     log
+        Include_Tag_Key             Off
+        Include_Time_Key            On
+        Time_Key                    TimeGenerated
+        Retry_Limit                 False
+        Log_Level                   info
+        compression_enabled         on
+        ingestion_endpoint_connect_timeout 60
+        ingestion_resources_refresh_interval 3600
+        # buffering_enabled false

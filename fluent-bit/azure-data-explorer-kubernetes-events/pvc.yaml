@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fluent-bit-kubernetes-events
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile-csi-fluent-bit
+  resources:
+    requests:
+      storage: 5Gi
