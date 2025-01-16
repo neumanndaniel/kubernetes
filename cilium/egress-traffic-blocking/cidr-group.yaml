@@ -1,0 +1,11 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumCIDRGroup
+metadata:
+  name: outbound-blocking
+  labels:
+    policy: "outbound-blocking"
+spec:
+  externalCIDRs:
+    - 217.160.0.92/32
+    - 217.160.0.111/32
+    - 217.160.223.1/32
