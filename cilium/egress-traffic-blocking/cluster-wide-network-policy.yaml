@@ -1,13 +1,13 @@
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: outbound-blocking
+  name: egress-traffic-blocking
   labels:
-    policy: "outbound-blocking"
+    policy: egress-traffic-blocking
 spec:
   endpointSelector: {}
   enableDefaultDeny:
     egress: false
   egressDeny:
     - toCIDRSet:
-        - cidrGroupRef: outbound-blocking
+        - cidrGroupRef: egress-traffic-blocking
