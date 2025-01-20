@@ -1,0 +1,12 @@
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: egress-traffic-allow
+  labels:
+    policy: egress-traffic-allow
+spec:
+  order: 1000
+  types:
+    - Egress
+  egress:
+    - action: Allow

@@ -1,0 +1,11 @@
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkSet
+metadata:
+  name: egress-traffic-blocking
+  labels:
+    policy: egress-traffic-blocking
+spec:
+  nets:
+    - 217.160.0.92/32
+    - 217.160.0.111/32
+    - 217.160.223.1/32

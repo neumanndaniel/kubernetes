@@ -1,0 +1,17 @@
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: egress-traffic-blocking
+  labels:
+    policy: egress-traffic-blocking
+spec:
+  order: 0
+  types:
+    - Egress
+  egress:
+    - action: Log
+      destination:
+        selector: policy == 'egress-traffic-blocking'
+    - action: Deny
+      destination:
+        selector: policy == 'egress-traffic-blocking'
