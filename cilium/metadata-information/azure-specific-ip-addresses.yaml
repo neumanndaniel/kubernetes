@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumCIDRGroup
+metadata:
+  name: azure-imds
+  labels:
+    k8s-app: azure-imds
+spec:
+  externalCIDRs:
+    - 169.254.169.254/32
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumCIDRGroup
+metadata:
+  name: azure-internal-dns
+  labels:
+    k8s-app: azure-internal-dns
+spec:
+  externalCIDRs:
+    - 168.63.129.16/32
