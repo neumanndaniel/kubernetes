@@ -1,0 +1,13 @@
+alloy:
+  configMap:
+    create: false
+    name: alloy-config
+    key: config.alloy
+  envFrom:
+    - secretRef:
+        name: alloy-azure-config
+  extraEnv:
+    - name: CLUSTER
+      value: aks-azst-1
+    - name: REGEX_METRICS_FILTER
+      value: ".+"

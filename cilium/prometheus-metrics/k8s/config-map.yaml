@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: grafana-alloy
+  labels:
+    app: grafana-alloy
+data:
+  config.alloy: |
+    logging {
+      level = "info"
+      format = "json"
+    }
+
+    discovery.kubernetes "pods" {
+      role = "pod"
+
+      namespaces {
+        own_namespace = false
+
+        names = ["kube-system"]
+      }
+
+      selectors {
+        role  = "pod"
+        field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
+      }
+    }
+
+    discovery.relabel "pods" {
+      targets = discovery.kubernetes.pods.targets
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_part_of"]
+        action = "keep"
+        regex = `cilium`
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+        action = "keep"
+        regex = `true`
+      }
+
+      rule {
+        source_labels = ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
+        action = "replace"
+        regex = `([^:]+)(?::\d+)?;(\d+)`
+        replacement = "${1}:${2}"
+        target_label = "__address__"
+      }
+
+      rule {
+          source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+          action = "replace"
+          regex = `(.+)`
+          target_label = "__metrics_path__"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_scheme"]
+        action = "replace"
+        regex = `(https?)`
+        target_label = "__scheme__"
+      }
+
+      rule {
+        action = "labelmap"
+        regex = `__meta_kubernetes_pod_label_(.+)`
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        action = "replace"
+        target_label = "namespace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        action = "replace"
+        target_label = "pod"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_port_number"]
+        action = "keep"
+        regex = `\d+`
+      }
+
+      rule {
+        replacement = sys.env("CLUSTER")
+        target_label = "cluster"
+      }
+    }
+
+    prometheus.scrape "pods" {
+      job_name = "kubernetes-pods"
+      honor_labels = true
+
+      targets    = discovery.relabel.pods.output
+      forward_to = [prometheus.relabel.pods.receiver]
+
+      scrape_interval = "30s"
+      scheme = "http"
+    }
+
+    prometheus.relabel "pods" {
+      forward_to = [prometheus.remote_write.azure_managed_prometheus.receiver]
+
+      rule {
+        source_labels = ["__name__"]
+        action = "keep"
+        regex = sys.env("REGEX_METRICS_FILTER")
+      }
+    }
+
+    prometheus.remote_write "azure_managed_prometheus" {
+      endpoint {
+        url = sys.env("ENDPOINT_URL")
+
+        oauth2 {
+          client_id = sys.env("CLIENT_ID")
+          client_secret = sys.env("CLIENT_SECRET")
+          token_url = "https://login.microsoftonline.com/" + sys.env("TENANT_ID") + "/oauth2/v2.0/token"
+          scopes    = ["https://monitor.azure.com/.default"]
+        }
+      }
+    }

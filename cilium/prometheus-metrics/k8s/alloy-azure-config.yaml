@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alloy-azure-config
+  namespace: grafana-alloy
+  labels:
+    app: grafana-alloy
+data:
+  CLIENT_ID: <BASE64_VALUE>
+  CLIENT_SECRET: <BASE64_VALUE>
+  ENDPOINT_URL: <BASE64_VALUE>
+  TENANT_ID: <BASE64_VALUE>
