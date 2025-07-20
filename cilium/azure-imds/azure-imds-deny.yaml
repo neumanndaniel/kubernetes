@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: azure-imds-deny
+  annotations:
+    description: "Deny traffic to Azure IMDS"
+  labels:
+    app.kubernetes.io/part-of: cilium
+    area: network-security
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+          - kube-system
+          - logging
+          - grafana-alloy
+  enableDefaultDeny:
+    egress: false
+    ingress: false
+  egressDeny:
+    - toCIDRSet:
+        - cidrGroupRef: azure-imds

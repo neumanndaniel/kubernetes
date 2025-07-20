@@ -1,0 +1,32 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: azure-imds-allow
+  annotations:
+    description: "Allow traffic to Azure IMDS"
+  labels:
+    app.kubernetes.io/part-of: cilium
+    area: network-security
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: In
+        values:
+          - kube-system
+          - logging
+          - grafana-alloy
+  enableDefaultDeny:
+    egress: false
+    ingress: false
+  egress:
+    - toCIDRSet:
+        - cidrGroupRef: azure-imds
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+          rules:
+            http:
+              - method: "GET"
+                path: "/metadata"
