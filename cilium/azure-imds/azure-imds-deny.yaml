@@ -22,3 +22,5 @@ spec:
   egressDeny:
     - toCIDRSet:
         - cidrGroupRef: azure-imds
+  log:
+    value: "ccnp_egress_denied_azure_imds"

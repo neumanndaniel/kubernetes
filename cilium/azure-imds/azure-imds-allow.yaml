@@ -30,3 +30,5 @@ spec:
             http:
               - method: "GET"
                 path: "/metadata"
+  log:
+    value: "ccnp_egress_allowed_azure_imds"
