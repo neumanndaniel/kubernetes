@@ -5,6 +5,7 @@ metadata:
   name: netperf
   labels:
     app.kubernetes.io/name: network-performance-test
+    io.cilium/mtls-enabled: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,43 +29,43 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  role: client
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    role: client
+                topologyKey: kubernetes.io/hostname
       containers:
-      - name: iperf3-server
-        image: cilium/netperf:latest
-        command: ["iperf3", "--server", "--forceflush"]
-        ports:
-        - name: iperf3-tcp
-          containerPort: 5201
-          protocol: TCP
-        - name: iperf3-udp
-          containerPort: 5201
-          protocol: UDP
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "64Mi"
-          limits:
-            cpu: "2"
-            memory: "256Mi"
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
+        - name: iperf3-server
+          image: cilium/netperf:latest
+          command: ["iperf3", "--server", "--forceflush"]
+          ports:
+            - name: iperf3-tcp
+              containerPort: 5201
+              protocol: TCP
+            - name: iperf3-udp
+              containerPort: 5201
+              protocol: UDP
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "64Mi"
+            limits:
+              cpu: "2"
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
       volumes:
-      - name: tmp
-        emptyDir: {}
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -75,14 +76,14 @@ spec:
   selector:
     app: iperf3-server
   ports:
-  - name: iperf3-tcp
-    port: 5201
-    targetPort: 5201
-    protocol: TCP
-  - name: iperf3-udp
-    port: 5201
-    targetPort: 5201
-    protocol: UDP
+    - name: iperf3-tcp
+      port: 5201
+      targetPort: 5201
+      protocol: TCP
+    - name: iperf3-udp
+      port: 5201
+      targetPort: 5201
+      protocol: UDP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -106,40 +107,40 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  role: client
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    role: client
+                topologyKey: kubernetes.io/hostname
       containers:
-      - name: netperf-server
-        image: cilium/netperf:latest
-        command: ["netserver", "-D", "-f"]
-        ports:
-        - name: netperf-ctrl
-          containerPort: 12865
-          protocol: TCP
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "64Mi"
-          limits:
-            cpu: "2"
-            memory: "256Mi"
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
+        - name: netperf-server
+          image: cilium/netperf:latest
+          command: ["netserver", "-D", "-f"]
+          ports:
+            - name: netperf-ctrl
+              containerPort: 12865
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "64Mi"
+            limits:
+              cpu: "2"
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
       volumes:
-      - name: tmp
-        emptyDir: {}
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -151,10 +152,10 @@ spec:
   selector:
     app: netperf-server
   ports:
-  - name: netperf-ctrl
-    port: 12865
-    targetPort: 12865
-    protocol: TCP
+    - name: netperf-ctrl
+      port: 12865
+      targetPort: 12865
+      protocol: TCP
 ---
 apiVersion: v1
 kind: Pod
@@ -168,32 +169,32 @@ spec:
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchLabels:
-            role: server
-        topologyKey: kubernetes.io/hostname
+        - labelSelector:
+            matchLabels:
+              role: server
+          topologyKey: kubernetes.io/hostname
   containers:
-  - name: client
-    image: cilium/netperf:latest
-    command: ["sleep", "infinity"]
-    resources:
-      requests:
-        cpu: "200m"
-        memory: "64Mi"
-      limits:
-        cpu: "2"
-        memory: "256Mi"
-    securityContext:
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: true
-      runAsUser: 1000
-      capabilities:
-        drop: ["ALL"]
-    volumeMounts:
-    - name: tmp
-      mountPath: /tmp
+    - name: client
+      image: cilium/netperf:latest
+      command: ["sleep", "infinity"]
+      resources:
+        requests:
+          cpu: "200m"
+          memory: "64Mi"
+        limits:
+          cpu: "2"
+          memory: "256Mi"
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        capabilities:
+          drop: ["ALL"]
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
   volumes:
-  - name: tmp
-    emptyDir: {}
+    - name: tmp
+      emptyDir: {}
   restartPolicy: Never
