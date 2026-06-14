@@ -27,3 +27,12 @@ The performance metrics were collected using tools such as iperf3 and netperf, f
 | TCP Latency (Mean µs/Transaction Rate) | 333/3000 | 123/8100 | 128/7826 | 124/8072 |
 | UDP Latency (Mean µs/Transaction Rate) | 340/2944 | 125/3540 | 125/8006 | 122/8158 |
 | TCP Stream (Throughput 10^6bits/sec) | 9809 | 8391 | 11497 | 11927 |
+
+## Results Summary - ztunnel on BYOCNI on Azure Kubernetes Service - Cilium 1.19.3
+
+| Test | Geneve | Geneve + ztunnel | Native Routing + ztunnel | Native Routing |
+| --- | --- | --- | --- | --- |
+| TCP Throughput (Gbit/s) | 7.2 | 9.6 | 12.0 | 12.0 |
+| Bidirectional Throughput (TX-C/RX-C) (Gbit/s) | 4.0/2.4 | 4.4/3.8 | 10.5/9.1 | 12.0/11.0 |
+| TCP Latency (Mean µs/Transaction Rate) | 164/6095 | 330/3030 | 261/3822 | 124/ 8072 |
+| TCP Stream (Throughput 10^6bits/sec) | 6809 | 4608 | 6664 | 11927 |
